@@ -22,8 +22,8 @@ class View
 
         $vars = array(
             'menu' => OkapiMenu::get_menu_html("examples.html"),
-            'okapi_base_url' => Settings::get('SITE_URL')."okapi/",
-            'site_url' => Settings::get('SITE_URL'),
+            'okapi_base_url' => Settings::get('SITE_HTTPX_URL')."okapi/",
+            'site_url' => Settings::get('SITE_HTTPX_URL'),
             'installations' => OkapiMenu::get_installations(),
             'okapi_rev' => Okapi::$version_number,
             'site_name' => Okapi::get_normalized_site_name(),

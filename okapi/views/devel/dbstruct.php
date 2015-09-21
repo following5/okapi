@@ -87,7 +87,7 @@ class View
                 {
                     $response->body .=
                         "-- REVERSE MODE. The following will alter [2], so that it has the structure of [1].\n".
-                        "-- 1. ".Settings::get('SITE_URL')."okapi/devel/dbstruct (".md5($struct).")\n".
+                        "-- 1. ".Settings::get('SITE_HTTPX_URL')."okapi/devel/dbstruct (".md5($struct).")\n".
                         "-- 2. ".$_GET['compare_to']." (".md5($alternate_struct).")\n\n";
                     $alters = $updater->getUpdates($alternate_struct, $struct);
                 }
@@ -95,7 +95,7 @@ class View
                 {
                     $response->body .=
                         "-- The following will alter [1], so that it has the structure of [2].\n".
-                        "-- 1. ".Settings::get('SITE_URL')."okapi/devel/dbstruct (".md5($struct).")\n".
+                        "-- 1. ".Settings::get('SITE_HTTPX_URL')."okapi/devel/dbstruct (".md5($struct).")\n".
                         "-- 2. ".$_GET['compare_to']." (".md5($alternate_struct).")\n\n";
                     $alters = $updater->getUpdates($struct, $alternate_struct);
                 }

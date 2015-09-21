@@ -23,8 +23,8 @@ class View
 
         $vars = array(
             'menu' => OkapiMenu::get_menu_html("introduction.html"),
-            'okapi_base_url' => Settings::get('SITE_URL')."okapi/",
-            'site_url' => Settings::get('SITE_URL'),
+            'okapi_base_url' => Settings::get('SITE_HTTPX_URL')."okapi/",
+            'site_url' => Settings::get('SITE_HTTPX_URL'),
             'method_index' => OkapiServiceRunner::call('services/apiref/method_index',
                 new OkapiInternalRequest(new OkapiInternalConsumer(), null, array())),
             'installations' => OkapiMenu::get_installations(),

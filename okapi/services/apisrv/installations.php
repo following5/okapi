@@ -66,9 +66,10 @@ class WebService
 
                 $results = array(
                     array(
-                        'site_url' => Settings::get('SITE_URL'),
+                        'site_url' => Settings::get('SITE_ID'),
                         'site_name' => "Unable to retrieve!",
-                        'okapi_base_url' => Settings::get('SITE_URL')."okapi/",
+                        'okapi_base_url' => Settings::get('SITE_ID')."okapi/",
+                        'https' => Settings::get('HTTPS'),
                     )
                 );
                 Cache::set($cachekey, $results, 12 * 3600); # so to retry no earlier than after 12 hours
@@ -84,6 +85,10 @@ class WebService
                     $okapi_base_url = (string)$inst[0]['okapi_base_url'];
                 else
                     $okapi_base_url = $site_url."okapi/";
+                if ($inst[0]['https'])
+                    $https = (string)$inst[0]['https'];
+                else
+                    $https = 'unavailable';
                 if ($inst[0]['site_name'])
                     $site_name = (string)$inst[0]['site_name'];
                 else
@@ -92,8 +97,9 @@ class WebService
                     'site_url' => $site_url,
                     'site_name' => $site_name,
                     'okapi_base_url' => $okapi_base_url,
+                    'https' => $https,
                 );
-                if ($site_url == Settings::get('SITE_URL'))
+                if ($site_url == Settings::get('SITE_ID'))
                     $i_was_included = true;
             }
 
@@ -103,9 +109,10 @@ class WebService
             if (!$i_was_included)
             {
                 $results[] = array(
-                    'site_url' => Settings::get('SITE_URL'),
+                    'site_url' => Settings::get('SITE_ID'),
                     'site_name' => "DEVELSITE",
-                    'okapi_base_url' => Settings::get('SITE_URL')."okapi/",
+                    'okapi_base_url' => Settings::get('SITE_ID')."okapi/",
+                    'https' => Settings::get('HTTPS'),
                 );
                 # Contact OKAPI developers in order to get added to the official sites list!
             }

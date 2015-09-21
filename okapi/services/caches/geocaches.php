@@ -238,7 +238,7 @@ class WebService
                     case 'location': $entry['location'] = round($row['latitude'], 6)."|".round($row['longitude'], 6); break;
                     case 'type': $entry['type'] = Okapi::cache_type_id2name($row['type']); break;
                     case 'status': $entry['status'] = Okapi::cache_status_id2name($row['status']); break;
-                    case 'url': $entry['url'] = Settings::get('SITE_URL')."viewcache.php?wp=".$row['wp_oc']; break;
+                    case 'url': $entry['url'] = Settings::get('SITE_HTTPX_URL')."viewcache.php?wp=".$row['wp_oc']; break;
                     case 'owner':
                         $owner_ids[$row['wp_oc']] = $row['user_id'];
                         /* continued later */
@@ -368,7 +368,7 @@ class WebService
                 $result_ref['owner'] = array(
                     'uuid' => $row['uuid'],
                     'username' => $row['username'],
-                    'profile_url' => Settings::get('SITE_URL')."viewprofile.php?userid=".$row['user_id']
+                    'profile_url' => Settings::get('SITE_HTTPX_URL')."viewprofile.php?userid=".$row['user_id']
                 );
             }
         }
@@ -614,7 +614,7 @@ class WebService
                 $image = array(
                     'uuid' => $row['uuid'],
                     'url' => $row['url'],
-                    'thumb_url' => Settings::get('SITE_URL') . 'thumbs.php?'.$object_type_param.'uuid=' . $row['uuid'],
+                    'thumb_url' => Settings::get('SITE_HTTPX_URL') . 'thumbs.php?'.$object_type_param.'uuid=' . $row['uuid'],
                     'caption' => $row['title'],
                     'unique_caption' => self::get_unique_caption($row['title']),
                     'is_spoiler' => ($row['spoiler'] ? true : false),
@@ -1367,7 +1367,12 @@ class WebService
     public static function get_cache_attribution_note(
         $cache_id, $lang, array $langpref, $owner, $type
     ) {
-        $site_url = Settings::get('SITE_URL');
+        # To avoid a big replication update if the HTTP setting changes, we
+        # link to the SITE_ID ULR in attribution notes whenever possible:
+        $site_url = Settings::get('SITE_ID');
+        if (Settings::get('HTTPS') == 'enforced')
+            $site_url = 'https' . strstr($site_url, '://');
+
         $site_name = Okapi::get_normalized_site_name();
         $cache_url = $site_url."viewcache.php?cacheid=$cache_id";
 

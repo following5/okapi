@@ -455,7 +455,7 @@ class CheckCronTab2 extends PrerequestCronJob
                 "Hello. OKAPI detected, that it's crontab is not working properly.\n".
                 "Please check your configuration or contact OKAPI developers.\n\n".
                 "This line should be present among your crontab entries:\n\n".
-                "*/5 * * * * wget -O - -q -t 1 ".Settings::get('SITE_URL')."okapi/cron5\n\n".
+                "*/5 * * * * wget -O - -q -t 1 ".Settings::get('SITE_ID')."okapi/cron5\n\n".
                 "If you're receiving this in Virtual Machine development environment, then\n".
                 "ignore it. Probably you just paused (or switched off) your VM for some time\n".
                 "(which would be considered an error in production environment)."

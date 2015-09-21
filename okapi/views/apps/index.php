@@ -26,7 +26,7 @@ class View
         if ($OC_user_id == null)
         {
             $after_login = "okapi/apps/".(($langpref != Settings::get('SITELANG'))?"?langpref=".$langpref:"");
-            $login_url = Settings::get('SITE_URL')."login.php?target=".urlencode($after_login);
+            $login_url = Settings::get('SITE_HTTPX_URL')."login.php?target=".urlencode($after_login);
             return new OkapiRedirectResponse($login_url);
         }
 
@@ -43,8 +43,8 @@ class View
             order by c.name
         ");
         $vars = array();
-        $vars['okapi_base_url'] = Settings::get('SITE_URL')."okapi/";
-        $vars['site_url'] = Settings::get('SITE_URL');
+        $vars['okapi_base_url'] = Settings::get('SITE_HTTPX_URL')."okapi/";
+        $vars['site_url'] = Settings::get('SITE_HTTPX_URL');
         $vars['site_name'] = Okapi::get_normalized_site_name();
         $vars['site_logo'] = Settings::get('SITE_LOGO');
         $vars['apps'] = array();

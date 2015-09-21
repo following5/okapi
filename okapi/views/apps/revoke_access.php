@@ -25,7 +25,7 @@ class View
         if ($OC_user_id == null)
         {
             $after_login = "okapi/apps/"; # it is correct, if you're wondering
-            $login_url = Settings::get('SITE_URL')."login.php?target=".urlencode($after_login);
+            $login_url = Settings::get('SITE_HTTPX_URL')."login.php?target=".urlencode($after_login);
             return new OkapiRedirectResponse($login_url);
         }
 
@@ -48,6 +48,6 @@ class View
 
         # Redirect back to the apps page.
 
-        return new OkapiRedirectResponse(Settings::get('SITE_URL')."okapi/apps/");
+        return new OkapiRedirectResponse(Settings::get('SITE_HTTPX_URL')."okapi/apps/");
     }
 }

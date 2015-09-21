@@ -42,7 +42,7 @@ $m = $vars['method'];
                             </tr>
                             <tr>
                                 <td class='caption' colspan='3'>
-                                    <b><?= \okapi\Settings::get('SITE_URL')."okapi/".$m['name'] ?></b>
+                                    <b><?= \okapi\Settings::get('SITE_HTTPX_URL')."okapi/".$m['name'] ?></b>
                                 </td>
                             </tr>
                             <tr>

@@ -34,7 +34,7 @@ class WebService
         # done in the "services" folder. 2) "services" don't display
         # any interactive webpages, they just return the result.
 
-        return new OkapiRedirectResponse(Settings::get('SITE_URL')."okapi/apps/authorize".
+        return new OkapiRedirectResponse(Settings::get('SITE_HTTPX_URL')."okapi/apps/authorize".
             "?oauth_token=".$token_key.(($langpref != null) ? "&langpref=".$langpref : "").
             "&interactivity=".$interactivity);
     }

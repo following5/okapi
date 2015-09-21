@@ -32,7 +32,7 @@ class WebService
         static $length = null;
         if ($host == null)
         {
-            $host = parse_url(Settings::get('SITE_URL'), PHP_URL_HOST);
+            $host = parse_url(Settings::get('SITE_HTTPX_URL'), PHP_URL_HOST);
             if (strpos($host, "www.") === 0)
                 $host = substr($host, 4);
             $length = strlen($host);

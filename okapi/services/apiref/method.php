@@ -96,7 +96,7 @@ class WebService
         switch ($plugin_name) {
             case 'docurl':
                 $fragment = $arr[1];
-                return Settings::get('SITE_URL')."okapi/introduction.html#".$fragment;
+                return Settings::get('SITE_HTTPX_URL')."okapi/introduction.html#".$fragment;
             case 'methodref':
             case 'methodargref':
             case 'methodretref':
@@ -104,7 +104,7 @@ class WebService
                 $result = '';
                 if ($elements[0] != '')
                 {
-                    $result .= Settings::get('SITE_URL')."okapi/".$elements[0].'.html';
+                    $result .= Settings::get('SITE_HTTPX_URL')."okapi/".$elements[0].'.html';
                 }
                 if (count($elements) > 1)
                 {
@@ -142,7 +142,7 @@ class WebService
         $result = array(
             'name' => $methodname,
             'short_name' => end($exploded),
-            'ref_url' => Settings::get('SITE_URL')."okapi/$methodname.html",
+            'ref_url' => Settings::get('SITE_HTTPX_URL')."okapi/$methodname.html",
             'auth_options' => array(
                 'min_auth_level' => $options['min_auth_level'],
                 'oauth_consumer' => $options['min_auth_level'] >= 2,
@@ -207,14 +207,14 @@ class WebService
                 'is_required' => false,
                 'is_deprecated' => false,
                 'class' => 'common-formatting',
-                'description' => "<i>Standard <a href='".Settings::get('SITE_URL')."okapi/introduction.html#common-formatting'>common formatting</a> argument.</i>"
+                'description' => "<i>Standard <a href='".Settings::get('SITE_HTTPX_URL')."okapi/introduction.html#common-formatting'>common formatting</a> argument.</i>"
             );
             $result['arguments'][] = array(
                 'name' => 'callback',
                 'is_required' => false,
                 'is_deprecated' => false,
                 'class' => 'common-formatting',
-                'description' => "<i>Standard <a href='".Settings::get('SITE_URL')."okapi/introduction.html#common-formatting'>common formatting</a> argument.</i>"
+                'description' => "<i>Standard <a href='".Settings::get('SITE_HTTPX_URL')."okapi/introduction.html#common-formatting'>common formatting</a> argument.</i>"
             );
         }
         foreach ($result['arguments'] as &$arg_ref)

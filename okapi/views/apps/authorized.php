@@ -37,15 +37,15 @@ class View
         {
             # Probably Request Token has expired or it was already used. We'll
             # just redirect to the Opencaching main page.
-            return new OkapiRedirectResponse(Settings::get('SITE_URL'));
+            return new OkapiRedirectResponse(Settings::get('SITE_HTTPX_URL'));
         }
 
         $vars = array(
-            'okapi_base_url' => Settings::get('SITE_URL')."okapi/",
+            'okapi_base_url' => Settings::get('SITE_HTTPX_URL')."okapi/",
             'token' => $token,
             'verifier' => $verifier,
             'site_name' => Okapi::get_normalized_site_name(),
-            'site_url' => Settings::get('SITE_URL'),
+            'site_url' => Settings::get('SITE_HTTPX_URL'),
             'site_logo' => Settings::get('SITE_LOGO'),
         );
         $response = new OkapiHttpResponse();

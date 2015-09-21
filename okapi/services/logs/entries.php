@@ -97,7 +97,7 @@ class WebService
                 'user' => array(
                     'uuid' => $row['user_uuid'],
                     'username' => $row['username'],
-                    'profile_url' => Settings::get('SITE_URL')."viewprofile.php?userid=".$row['user_id'],
+                    'profile_url' => Settings::get('SITE_HTTPX_URL')."viewprofile.php?userid=".$row['user_id'],
                 ),
                 'type' => Okapi::logtypeid2name($row['type']),
                 'was_recommended' => $row['was_recommended'] ? true : false,
@@ -136,7 +136,7 @@ class WebService
                     array(
                         'uuid' => $row['uuid'],
                         'url' => $row['url'],
-                        'thumb_url' => Settings::get('SITE_URL') . 'thumbs.php?'.$object_type_param.'uuid=' . $row['uuid'],
+                        'thumb_url' => Settings::get('SITE_HTTPX_URL') . 'thumbs.php?'.$object_type_param.'uuid=' . $row['uuid'],
                         'caption' => $row['title'],
                         'is_spoiler' => ($row['spoiler'] ? true : false),
                     );

@@ -15,7 +15,7 @@ class OkapiMenu
 {
     private static function link($current_path, $link_path, $link_name)
     {
-        return "<a href='".Settings::get('SITE_URL')."okapi/$link_path'".(($current_path == $link_path)
+        return "<a href='".Settings::get('SITE_HTTPX_URL')."okapi/$link_path'".(($current_path == $link_path)
             ? " class='selected'" : "").">$link_name</a><br>";
     }
 
@@ -70,7 +70,13 @@ class OkapiMenu
         $installations = OkapiServiceRunner::call("services/apisrv/installations",
             new OkapiInternalRequest(new OkapiInternalConsumer(), null, array()));
         foreach ($installations as &$inst_ref)
-            $inst_ref['selected'] = ($inst_ref['site_url'] == Settings::get('SITE_URL'));
+        {
+            if (in_array($inst_ref['https'], array('recommended', 'enforced')))
+                $inst_ref['okapi_default_base_url'] = 'https' . strstr($inst_ref['okapi_base_url'], '://');
+            else
+                $inst_ref['okapi_default_base_url'] = 'http' . strstr($inst_ref['okapi_base_url'], '://');
+            $inst_ref['selected'] = ($inst_ref['site_url'] == Settings::get('SITE_ID'));
+        }
         return $installations;
     }
 }

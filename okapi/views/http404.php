@@ -15,7 +15,7 @@ class View
         require_once('menu.inc.php');
 
         $vars = array(
-            'okapi_base_url' => Settings::get('SITE_URL')."okapi/",
+            'okapi_base_url' => Settings::get('SITE_HTTPX_URL')."okapi/",
             'menu' => OkapiMenu::get_menu_html(),
             'installations' => OkapiMenu::get_installations(),
             'okapi_rev' => Okapi::$version_number,

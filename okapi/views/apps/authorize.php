@@ -54,11 +54,11 @@ class View
             # by the user, who knows nothing on tokens and OAuth. Let's be nice then!
 
             $vars = array(
-                'okapi_base_url' => Settings::get('SITE_URL')."okapi/",
+                'okapi_base_url' => Settings::get('SITE_HTTPX_URL')."okapi/",
                 'token' => $token,
                 'token_expired' => true,
                 'site_name' => Okapi::get_normalized_site_name(),
-                'site_url' => Settings::get('SITE_URL'),
+                'site_url' => Settings::get('SITE_HTTPX_URL'),
                 'site_logo' => Settings::get('SITE_LOGO'),
                 'locales' => $locales,
             );
@@ -96,7 +96,7 @@ class View
             # We should be logged out now. Let's login again.
 
             $after_login = "okapi/apps/authorize?oauth_token=$token_key".(($langpref != Settings::get('SITELANG'))?"&langpref=".$langpref:"");
-            $login_url = Settings::get('SITE_URL')."login.php?target=".urlencode($after_login)
+            $login_url = Settings::get('SITE_HTTPX_URL')."login.php?target=".urlencode($after_login)
                 ."&langpref=".$langpref;
             return new OkapiRedirectResponse($login_url);
         }
@@ -144,7 +144,7 @@ class View
                     } else {
                         # Consumer did not provide a callback URL (oauth_callback=oob).
                         # We'll have to redirect to the Opencaching main page then...
-                        return new OkapiRedirectResponse(Settings::get('SITE_URL')."index.php");
+                        return new OkapiRedirectResponse(Settings::get('SITE_HTTPX_URL')."index.php");
                     }
                 }
             }
@@ -152,10 +152,10 @@ class View
             {
                 # Not yet authorized. Display an authorization request.
                 $vars = array(
-                    'okapi_base_url' => Settings::get('SITE_URL')."okapi/",
+                    'okapi_base_url' => Settings::get('SITE_HTTPX_URL')."okapi/",
                     'token' => $token,
                     'site_name' => Okapi::get_normalized_site_name(),
-                    'site_url' => Settings::get('SITE_URL'),
+                    'site_url' => Settings::get('SITE_HTTPX_URL'),
                     'site_logo' => Settings::get('SITE_LOGO'),
                     'locales' => $locales,
                 );
@@ -185,7 +185,7 @@ class View
         } else {
             # Consumer did not provide a callback URL (probably the user is using a desktop
             # or mobile application). We'll just have to display the verifier to the user.
-            return new OkapiRedirectResponse(Settings::get('SITE_URL')."okapi/apps/authorized?oauth_token=".$token_key
+            return new OkapiRedirectResponse(Settings::get('SITE_HTTPX_URL')."okapi/apps/authorized?oauth_token=".$token_key
                 ."&oauth_verifier=".$token['verifier']."&langpref=".$langpref);
         }
     }

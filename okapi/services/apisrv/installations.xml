@@ -13,20 +13,44 @@
         <p>A dictionary of the following structure:</p>
         <ul>
             <li>
+                <b>site_name</b> - universal name for this site (should be fine
+                for all languages),
+            </li>
+            <li>
                 <b>site_url</b> - URL of the Opencaching site which is running
                 the OKAPI installation (usually this looks like
                 "http://www.opencaching.<i>xx</i>/", where <b>xx</b> is a top
-                level domain of a country).
-            </li>
-            <li>
-                <b>site_name</b> - universal name for this site (should be fine
-                for all languages),
+                level domain of a country). If you prefer either http or https
+                access, evaluate <b>https</b> to find out if the desired
+                scheme is available, and eventually replace the scheme in the
+                <b>site_url</b> string.
             </li>
             <li>
                 <b>okapi_base_url</b> - URL of the OKAPI installation (usually this is
                 <b>site_url</b> with "okapi/" appended, but you should not assume
                 that); this value is to be used as a prefix when constructing service
-                method URLs.
+                method URLs. If you prefer either http oder https access, evaluate
+                <b>https</b> to find out if the desired scheme is available, and
+                eventually replace the scheme in the <b>okapi_base_url</b> string.
+            </li>
+            <li>
+                <b>https</b> - https support of the Opencaching site and the OKAPI
+                installation; one of the following:
+                <ul>
+                    <li>
+                        <b>unavailable</b> - https will not work (properly) or will be redirected to http,
+                    </li>
+                    <li>
+                        <b>availaible</b> - http and https will both work,
+                    </li>
+                    <li>
+                        <b>recommended</b> - http and https will both work, but http is
+                        deprecated; if your application allows it, use https,
+                    </li>
+                    <li>
+                        <b>enforced</b> - http will be redirected to https.
+                    </li>
+                </ul>
             </li>
         </ul>
     </returns>

@@ -111,7 +111,7 @@ class WebService
             foreach ($tmp as &$row_ref) {
                 $map[$row_ref['id']] = &$row_ref;
             }
-            $prefix = Settings::get('SITE_URL');
+            $prefix = Settings::get('SITE_HTTPX_URL');
             foreach ($results as &$attr_ref) {
                 $internal_id = $attr_ref['internal_id'];
                 if (isset($map[$internal_id])) {

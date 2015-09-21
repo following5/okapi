@@ -34,7 +34,7 @@ class View
         $vars = array(
             'method' => $method,
             'menu' => OkapiMenu::get_menu_html($methodname.".html"),
-            'okapi_base_url' => Settings::get('SITE_URL')."okapi/",
+            'okapi_base_url' => Settings::get('SITE_HTTPX_URL')."okapi/",
             'installations' => OkapiMenu::get_installations(),
             'okapi_rev' => Okapi::$version_number,
         );

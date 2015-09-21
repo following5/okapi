@@ -131,24 +131,40 @@ final class Settings
         'DB_PASSWORD' => null,
 
         /**
-         * URL of this site (with slash, and without "/okapi"). If this is a
-         * development installation, it should point to the local URL (e.g.
-         * "http://localhost/".
+         * URL of this site (with slash, and without "/okapi"). If this is
+         * a development installation, it should point to the local URL (e.g.
+         * "http://localhost/").
+         *
+         * This setting is internal to the settigns class.
+         * SITE_ID and SITE_HTTPX_URL will be generated from it.
          */
         'SITE_URL' => null,
+
+        /**
+         * https support of the site:
+         *   'unavailable':  https is not available or deprecated;
+         *                     https requests should be redirected to http
+         *   'available':    both http and https can be used;
+         *                     when in doubt, refer to the site as 'http://...'
+         *   'recommended':  both http and https can be used;
+         *                     when in doubt, refer to the site as 'https://...'
+         *   'enforced':     http is not available or deprecated;
+         *                     http requests should be redirected to https
+         */
+        'HTTPS' => 'unavailable',
 
         /**
          * URL of the official OC site. For production sites, it should equal
          * SITE_URL (this is also the default). For development installations,
          * it should point to the official OC site from which you got your
-         * database dump (e.g. "http://opencaching.pl/").
+         * database dump (e.g. "http://opencaching.pl/"). If the site supports
+         * https or uses it by default, ORIGIN_URL still must start with "http:".
          */
         'ORIGIN_URL' => null,
 
         /**
          * OKAPI needs this when inserting new data to cache_logs table. Node
-         * IDs serve a similar purpose for OC sites that ORIGIN_URL does for
-         * OKAPI.
+         * IDs serve a similar purpose for OC sites that SITE_ID does for OKAPI.
          */
         'OC_NODE_ID' => null,
 
@@ -216,6 +232,34 @@ final class Settings
                 self::$SETTINGS[$key] = $ref[$key];
             }
         }
+
+        # process / generate site URL and HTTP settings
+        if (self::$SETTINGS['SITE_URL'] != null)
+        {
+            /**
+             * URL-formed ID of the site; is determined once when creating an OKAPI
+             * installation and will never be changed.
+             */
+            self::$SETTINGS['SITE_ID'] = self::$SETTINGS['SITE_URL'];
+
+            /**
+             * The URL of the OC site within the current request (http or https),
+             * with trailing '/' and without 'okapi'. Links and redirects within
+             * OKAPI will usually refer to this URL, so that each request stays
+             * within the same protocol.
+             */
+            if (isset($_SERVER['HTTPS']))
+                self::$SETTINGS['SITE_HTTPX_URL'] = 'https' . strstr(self::$SETTINGS['SITE_URL'], '://');
+            else
+                self::$SETTINGS['SITE_HTTPX_URL'] = 'http' . strstr(self::$SETTINGS['SITE_URL'], '://');
+        }
+        else
+        {
+            self::$SETTINGS['SITE_ID'] = null;
+            self::$SETTINGS['SITE_HTTPX_URL'] = null;
+        }
+        unset(self::$SETTINGS['SITE_URL']);
+
         self::verify(self::$SETTINGS);
     }
 
@@ -240,18 +284,23 @@ final class Settings
         foreach ($dict as $k => $v)
             if ((strpos($k, '_DIR') !== false) && ($k[strlen($k) - 1] == '/'))
                 throw new Exception("None of the *_DIR settings may end with a slash. Check $k.");
-        $notnull = array('OC_COOKIE_NAME', 'DB_SERVER', 'DB_NAME', 'DB_USERNAME', 'SITE_URL', 'OC_NODE_ID');
+        $notnull = array('OC_COOKIE_NAME', 'DB_SERVER', 'DB_NAME', 'DB_USERNAME', 'SITE_ID', 'SITE_HTTPX_URL', 'OC_NODE_ID');
         foreach ($notnull as $k)
             if ($dict[$k] === null)
                 throw new Exception("$k cannot be null.");
         if ($dict['ORIGIN_URL'] === null)
-            $dict['ORIGIN_URL'] = $dict['SITE_URL'];
-        $slash_keys = array('SITE_URL', 'ORIGIN_URL');
+            $dict['ORIGIN_URL'] = $dict['SITE_ID'];
+        $https_options = array('unavailable', 'available', 'recommended', 'enforced');
+        if (!in_array($dict['HTTPS'], $https_options))
+            throw new Exception("HTTPS must be one of: ".implode(", ", $https_options));
+        if ($dict['HTTPS'] == 'enforced')
+            throw new Exception("The 'enforced' HTTPS setting is not implemented yet in OKAPI.");
+        $slash_keys = array('SITE_ID', 'ORIGIN_URL', 'SITE_HTTPX_URL');
         foreach ($slash_keys as $key)
             if ($dict[$key][strlen($dict[$key]) - 1] != '/')
                 throw new Exception("$key must end with a slash.");
         if ($dict['SITE_LOGO'] === null)
-            $dict['SITE_LOGO'] = $dict['SITE_URL'] . 'okapi/static/oc_logo.png';
+            $dict['SITE_LOGO'] = $dict['SITE_HTTPX_URL'] . 'okapi/static/oc_logo.png';
     }
 
     /**

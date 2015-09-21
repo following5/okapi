@@ -57,7 +57,7 @@ class WebService
                 {
                     case 'uuid': $entry['uuid'] = $row['uuid']; break;
                     case 'username': $entry['username'] = $row['username']; break;
-                    case 'profile_url': $entry['profile_url'] = Settings::get('SITE_URL')."viewprofile.php?userid=".$row['user_id']; break;
+                    case 'profile_url': $entry['profile_url'] = Settings::get('SITE_HTTPX_URL')."viewprofile.php?userid=".$row['user_id']; break;
                     case 'is_admin':
                         if (!$request->token) {
                             $entry['is_admin'] = null;

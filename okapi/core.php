@@ -56,7 +56,7 @@ class BadRequest extends Exception {
             'reason_stack' => array(),
         );
         $this->provideExtras($extras);
-        $extras['more_info'] = Settings::get('SITE_URL')."okapi/introduction.html#errors";
+        $extras['more_info'] = Settings::get('SITE_HTTPX_URL')."okapi/introduction.html#errors";
         return json_encode(array("error" => $extras));
     }
 }
@@ -1138,7 +1138,7 @@ class Okapi
     public static function get_normalized_site_name($site_url = null)
     {
         if ($site_url == null)
-            $site_url = Settings::get('SITE_URL');
+            $site_url = Settings::get('SITE_ID');
         $matches = null;
         if (preg_match("#^https?://(www.)?opencaching.([a-z.]+)/$#", $site_url, $matches)) {
             return "Opencaching.".strtoupper($matches[2]);
@@ -1356,7 +1356,7 @@ class Okapi
         print "Note: Consumer Secret is needed only when you intend to use OAuth.\n";
         print "You don't need Consumer Secret for Level 1 Authentication.\n\n";
         print "Now you can easily access Level 1 OKAPI methods. E.g.:\n";
-        print Settings::get('SITE_URL')."okapi/services/caches/geocache?cache_code=$sample_cache_code&consumer_key=$consumer->key\n\n";
+        print Settings::get('SITE_HTTPX_URL')."okapi/services/caches/geocache?cache_code=$sample_cache_code&consumer_key=$consumer->key\n\n";
         print "If you plan on using OKAPI for a longer time, then you may want to\n";
         print "subscribe to the OKAPI News blog to stay up-to-date:\n";
         print "http://opencaching-api.blogspot.com/\n\n";
@@ -1850,7 +1850,7 @@ class Okapi
 
         $html = preg_replace(
             "~\b(src|href)=([\"'])(?![a-z0-9_-]+:)~",
-            "$1=$2".Settings::get("SITE_URL"),
+            "$1=$2".Settings::get("SITE_HTTPX_URL"),
             $html
         );
 
