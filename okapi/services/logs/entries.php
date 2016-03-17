@@ -23,8 +23,8 @@ class WebService
     }
 
     private static $valid_field_names = array(
-        'uuid', 'cache_code', 'date', 'user', 'type', 'was_recommended', 'comment',
-        'images', 'internal_id', 'oc_team_entry', 'needs_maintenance2',
+        'uuid', 'cache_code', 'date', 'user', 'type', 'type2', 'was_recommended',
+        'comment', 'images', 'internal_id', 'oc_team_entry', 'needs_maintenance2',
         'listing_is_outdated',
     );
 
@@ -68,6 +68,7 @@ class WebService
         $rs = Db::query("
             select
                 cl.id, c.wp_oc as cache_code, cl.uuid, cl.type,
+                IF(cl.type IN (5, 12), 3, cl.type) AS type2,
                 ".$teamentry_field." as oc_team_entry,
                 ".$needs_maintenance_SQL." as needs_maintenance2,
                 ".$listing_is_outdated_SQL." as listing_is_outdated,
@@ -108,6 +109,7 @@ class WebService
                     'profile_url' => Settings::get('SITE_URL')."viewprofile.php?userid=".$row['user_id'],
                 ),
                 'type' => Okapi::logtypeid2name($row['type']),
+                'type2' => Okapi::logtypeid2name($row['type2']),
                 'was_recommended' => $row['was_recommended'] ? true : false,
                 'needs_maintenance2' => $flag_options[$row['needs_maintenance2']],
                 'listing_is_outdated' => $flag_options[$row['listing_is_outdated']],

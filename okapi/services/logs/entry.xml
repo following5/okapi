@@ -32,8 +32,18 @@
                     <li><b>profile_url</b> - URL of the profile page of the user,</li>
                 </ul>
             </li>
+            <li class='deprecated'>
+                <p><b>type</b> - deprecated
+                (<a href='https://github.com/opencaching/okapi/issues/374'>Why?</a>),
+                string; same as <b>type2</b>, with the exception that it may have the
+                value "Needs maintenance" or "OC Team comment". For those OC sites that
+                implement these log types, <b>type2</b> will return "Comment" instead.
+                The "needs maintenance" and "OC team comment" information can be
+                retrieved via the <b>needs maintenance</b> and <b>oc_team_entry</b>
+                fields.</p>
+            </li>
             <li>
-                <p><b>type</b> - string; log type. One of the values documented
+                <p><b>type2</b> - string; log type. One of the values documented
                 below.</p>
 
                 <p>Primary types, commonly used by all Opencaching installations:</p>
@@ -79,13 +89,9 @@
                 <p>Other types (used only by some Opencaching installations):</p>
 
                 <ul>
-                    <li>"Needs maintenance" - the user stated that the cache was
-                        in need of maintenance.</li>
                     <li>"Maintenance performed" - the cache owner stated that he
                         has performed the maintenance.</li>
                     <li>"Moved" - the cache was moved to a different location.</li>
-                    <li>"OC Team comment" - a comment made by the official OC Team
-                        member.</li>
                     <li><i>(to be continued)</i> - this list MAY expand in time!
                         Your application should accept unknown log types (you may
                         treat them as "Comment"s).</li>
