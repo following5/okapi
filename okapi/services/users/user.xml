@@ -51,8 +51,8 @@
                 been problems with delivering emails to this user; <b>false</b>
                 if not.</p>
 
-                <p>This flag is only supported by some OC sites; other sites
-                will always return <b>false</b>.</p>
+                <p>This information is provided only by some OC sites; other
+                sites will always return <b>false</b>.</p>
             </li>
          </ul>
 
@@ -70,15 +70,6 @@
                 <p><b>home_location</b> - home location of the user in the "lat|lon" format
                 (lat and lon are in full degrees with a dot as a decimal point);
                 <b>null</b> if no home location is given in the user's Opencaching profile.</p>
-            </li>
-            <li>
-                <p><b>disclose_email_sender_address</b> - <b>true</b> if the
-                email address of the user is used as the sender (From:) of
-                emails to other users by default.</p>
-
-                <p>Depending on the OC site, this may always be <b>true</b>,
-                always be <b>false</b> or reflect a setting in the user's
-                profile.</p>
             </li>
         </ul>
 

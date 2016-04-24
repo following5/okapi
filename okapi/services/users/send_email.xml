@@ -30,9 +30,8 @@
         <p>The format of the <b>body</b> text, either <b>plaintext</b> or
         <b>html</b>.</p>
     </req>
-    <opt name='disclose_address' default='default'>
-        <p>Determines the sender address (From:) of the email, when reporting
-        to the owner. One of the following:</p>
+    <req name='disclose_address'>
+        <p>Determines the sender address (From:) of the email:</p>
         <ul>
             <li>
                 <b>true</b> - the sender address is your user's email address,
@@ -40,18 +39,14 @@
             </li>
             <li>
                 <b>false</b> - the sender address is some dummy like
-                "noreply@opencaching.xx",
-            </li>
-            <li>
-                <b>default</b> - use the OC site default, as returned in the
-                field <b>disclose_email_sender_address</b> of
-                <a href='../users/user.html'>services/users/user</a>.
+                "noreply@opencaching.xx".
             </li>
         </ul>
         <p>Setting this to <b>true</b> makes it simpler for the recipient
         to answer the email, which makes it more likely to get an answer
-        at all.</p>
-    </opt>
+        at all. You should allow your user to chose if the email address
+        shall be disclosed.</p>
+    </req>
     <common-format-params/>
     <returns>
         <p>A dictionary of the following structure:</p>
