@@ -46,7 +46,7 @@
                 <p><b>statuses</b> - list of the cache statuses which are
                 currently available at this installation. See the
                 <a href='%OKAPI:methodargref:services/caches/geocache%'>services/caches/geocache</a>
-                method for more information on cache types.</p>
+                method for more information on cache statuses.</p>
             </li>
             <li>
                 <p><b>has_ratings</b> - boolean, <b>true</b> if this installation

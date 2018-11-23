@@ -16,8 +16,8 @@
         <p>Code of the geocache.</p>
     </req>
     <opt name='name'>
-        <p>New name of the cache. The old name to be replaced must be be
-        supplied as <b>old_name</b>.</p>
+        <p>New name of the cache. The old name to be replaced must be supplied
+        as <b>old_name</b>.</p>
     </opt>
     <opt name='old_name'>
         <p>The old cache name to be replaced.</p>
@@ -129,8 +129,7 @@
                 <ul>
                     <li><b>true</b> if all of the supplied geocache properties
                     were saved successfully or if no property to be changed was
-                    supplied. The geocache's <b>last_modified</b> date has been
-                    updated if any property was changed,</li>
+                    supplied,</li>
 
                     <li><b>false</b> if nothing was saved, which means that at
                     least one of the supplied parameters was logically invalid.
@@ -141,8 +140,9 @@
             <li>
                 <p><b>messages</b> - a dictionary of the supplied parameters
                 that were not acceptable, each entry giving a plain-text string
-                that explains the reason of rejection. The dictionary is empty
-                in case of success.</p>
+                that explains the reason of rejection. Each of the strings can
+                consist of multiple lines, separated with newlines (\n). The
+                dictionary is empty in case of success.</p>
             </li>
         </ul>
         <p>The method responds with an HTTP 400 error if parameters were

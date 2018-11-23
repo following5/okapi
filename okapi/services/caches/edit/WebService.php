@@ -36,7 +36,7 @@ class WebService
                 $request->token,
                 array(
                     'cache_code' => $cache_code,
-                    'fields' => 'internal_id|type|date_created|location|type|size2|difficulty|terrain|trip_time|trip_distance|attr_acodes|names|name'
+                    'fields' => 'internal_id|type|date_created|location|type|size2|difficulty|terrain|trip_time|trip_distance|attr_acodes|names|name|req_passwd'
                 )
             )
         );
@@ -74,15 +74,17 @@ class WebService
                     throw new Exception("Unexpected cache name count");
                 elseif ($old_name != $cache['name'])
                     throw new InvalidParam('old_name', "'".$old_name."' does not match the cache name.");
-                else
-                    $change_sqls_escaped[] = "name = '".Db::escape_string($name)."'";
+                elseif (trim($name) == '')
+                    $problems['name'] = _("The cache name must not be empty.");
+                elseif ($name != $cache['name'])
+                    $change_sqls_escaped[] = "name = '".Db::escape_string(trim($name))."'";
             }
 
             # type
 
             $type = $request->get_parameter('type');
             if ($type !== null) {
-                if (!in_array($type, Okapi::get_local_okapi_cache_types()))
+                if (!in_array($type, Okapi::get_local_cachetypes()))
                     throw new InvalidParam('type');
                 elseif ($type != $cache['type'])
                     $change_sqls_escaped[] = "type = ".Okapi::cache_type_name2id($type);
@@ -107,10 +109,12 @@ class WebService
                 $coords = Okapi::parse_location($location);
                 if ($coords === null)
                     throw new InvalidParam('location');
-                if ($coords[0] < -90 || $coords[0] > 90)
+                elseif ($coords[0] < -90 || $coords[0] > 90)
                     $problems['location'] = _("Latitude degrees must range between -90 and 90.");
                 elseif ($coords[1] < -180 || $coords[1] > 180)
                     $problems['location'] = _("Longitude degrees must range between -180 and 180.");
+                else if ($coords[0] == 0 && $coords[1] == 0)
+                    $problems['location'] = _("Coordinates must not be 0/0.");   # common error
                 else {
                     $old_coords = Okapi::parse_location($cache['location']);
                     if ($coords != $old_coords) {
@@ -131,7 +135,7 @@ class WebService
             {
                 if (!in_array($size, Okapi::get_local_cache_sizes()))
                     throw new InvalidParam('size');
-                if (!in_array($size, $capabilities['sizes']))
+                elseif (!in_array($size, $capabilities['sizes']))
                     $problems['size'] = _("This size is not available for this type of cache.");
                 elseif ($size != $cache['size2'])
                     $change_sqls_escaped[] = "size = ".Okapi::cache_size2_to_sizeid($size);
@@ -153,11 +157,11 @@ class WebService
                 $tmp = $request->get_parameter($property);
                 if ($tmp != null)
                 {
-                    if (!preg_match('/^[0-9](\.[0-9])?$/', $tmp))
+                    if (!preg_match('/^[0-9](\.[05]0*)?$/', $tmp))
                         throw new InvalidParam($property);
                     elseif (!in_array($tmp, [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]))
                         throw new InvalidParam($property);
-                    elseif ($tmp != $cache[$property])
+                    elseif (2 * $tmp != $cache[$property])
                         $change_sqls_escaped[] = $property." = ".(2 * $tmp);
                 }
             }
@@ -217,17 +221,24 @@ class WebService
                         $capabilities['password_max_length']
                     );
                 } else {
+                    # There are passwords in OC databases that only consist of space(s).
+                    # OCPL still allows to enter them. We retain those old passwords, but
+                    # will trim any new password.
+
                     $oldpw = Db::select_value("select logpw from caches where cache_id='".$cache_internal_id_escaped."'");
                     if ($passwd != $oldpw)
-                        $change_sqls_escaped[] = "logpw = '".Db::escape_string($passwd)."'";
+                        $change_sqls_escaped[] = "logpw = '".Db::escape_string(trim($passwd))."'";
                     unset($oldpw);
                 }
             } elseif (
-                $type != $cache['type'] && $type != 'Traditional' &&
-                Settings::get('OC_BRANCH') == 'oc.pl'
+                $cache['req_passwd'] != '' &&
+                Settings::get('OC_BRANCH') == 'oc.pl' &&
+                $type != $cache['type'] && $type == 'Traditional'
             ) {
-                # Remove password after type change.
-                $change_sqls_escaped[] = "logpw = ''";
+                $problems['type'] = sprintf(
+                    _('%s does not allow log passwords for traditional caches.'),
+                    Okapi::get_normalized_site_name()
+                ) . _("Please choose another cache type or remove the password.");
             }
 
             # gc_code
@@ -265,6 +276,7 @@ class WebService
             $attributes = $request->get_parameter('attributes');
             if ($attributes !== null)
             {
+                $attr_problems = [];
                 $available_acodes = OkapiServiceRunner::call(
                     'services/attrs/attribute_index',
                     new OkapiInternalRequest(
@@ -283,16 +295,23 @@ class WebService
                     if ($remove)
                         $acode = substr($acode, 1);
                     if (!isset($available_acodes[$acode]))
-                        throw new InvalidParam('attributes', "Invalid A-Code: '".$acode."'");
+                        throw new InvalidParam('attributes', "Invalid A-code: '".$acode."'");
                     if ($remove)
                         $acodes_to_remove[] = $acode;
                     elseif ($available_acodes[$acode]['is_addable'])
                         $acodes_to_add[] = $acode;
+                    else {
+                        $attr_problems[] = sprintf(
+                            _("The attribute '%s' can no longer be added to %s caches."),
+                            $available_acodes[$acode]['name'],
+                            Okapi::get_normalized_site_name()
+                        );
+                    }
                 }
                 unset($remove);
                 unset($acode);
 
-                # test for conflicts
+                # test for conflicting attributes
 
                 if ($tmp = array_intersect($acodes_to_remove, $acodes_to_add)) {
                     throw new InvalidParam(
@@ -304,17 +323,26 @@ class WebService
                     array_diff($cache['attr_acodes'], $acodes_to_remove),
                     $acodes_to_add
                 );
+                $already_warned = [];
                 foreach ($acodes_to_add as $acode)
                     foreach ($available_acodes[$acode]['incompatible_acodes'] as $incompatible)
-                        if (in_array($incompatible, $effective_acodes)) {
-                            $problems['attributes'] = sprintf(
+                        if (in_array($incompatible, $effective_acodes) &&
+                            !isset($already_warned[$incompatible.$acode])
+                        ) {
+                            $attr_problems[] = sprintf(
                                 _("The attributes '%s' and '%s' contradict."),
                                 $available_acodes[$acode]['name'],
                                 $available_acodes[$incompatible]['name']
                             );
-                            break 2;
+                            $already_warned[$acode.$incompatible] = true;
                         }
+                unset($already_warned);
                 unset($effective_acodes);
+
+                if ($attr_problems) {
+                    $problems['attributes'] = implode("\n", $attr_problems);
+                }
+                unset($attr_problems);
             }
 
             # descriptions and hint
@@ -338,7 +366,7 @@ class WebService
                 if (!isset($tmp['languages'][$language]))
                     throw new InvalidParam('language', "Invalid language code: '".$language."'");
 
-                # purify texts
+                # purify/trim/encode texts
 
                 if ($description != '') {
                     list($description, $value_for_desc_html_field)
@@ -349,9 +377,11 @@ class WebService
                     $short_description = trim($short_description);
                 }
                 if ($hint != '') {
-                    $hint = preg_replace('/\r\n?/', '\n', $hint);
-                    $hint = preg_replace('/\t/', ' ', $hint);
-                    $hint = trim($hint);
+                    # Both OC branches store the hint as HTML with \r\n line breaks.
+
+                    $hint = htmlspecialchars(trim($hint), ENT_COMPAT);
+                    $hint = preg_replace('~\R~u', "\r\n", $hint);   # https://stackoverflow.com/questions/7836632
+                    $hint = nl2br($hint);
                 }
 
                 # validate texts
@@ -361,14 +391,17 @@ class WebService
                     select 1 from cache_desc
                     where cache_id = '".$cache_internal_id_escaped."'
                     and language ='".$language_upper_escaped."'
+                    limit 1
                 ");
-                if ($is_new_language && $description.$short_description.$hint == '') {
+                if ($is_new_language && $description.$short_description.$hint == '')
+                {
+                    # Return messages with priority in mostly used field.
                     if ($description !== null)
                         $problems['description'] = _("Please enter some text.");
-                    elseif ($short_description !== null)
-                        $problems['short_description'] = _("Please enter some text.");
-                    else
+                    elseif ($hint !== null)
                         $problems['hint'] = _("Please enter some text.");
+                    else
+                        $problems['short_description'] = _("Please enter some text.");
                 }
             }
 
@@ -390,6 +423,7 @@ class WebService
 
             if ($desc_changes)
             {
+                $desc_saved = false;
                 if ($is_new_language)
                 {
                     # There is a slight chance that since calculation of $is_new_language,
@@ -402,6 +436,7 @@ class WebService
                         select 1 from cache_desc
                         where cache_id = '".$cache_internal_id_escaped."'
                         and language ='".$language_upper_escaped."'
+                        limit 1
                     ");
                     if (!$is_new_language)
                     {
@@ -425,10 +460,11 @@ class WebService
                                 '".Db::escape_string(Okapi::get_default_value_for_text_htmledit($request->token->user_id))."',
                                 '".Db::escape_string($hint)."',
                                 '".Db::escape_string($short_description)."',
-                                NOW(),
-                                NOW()
+                                now(),
+                                now()
                             )
                         ");
+                        $desc_saved = true;
                         $desc_internal_id = Db::last_insert_id();
                         Db::execute("
                             insert into okapi_submitted_objects (object_type, object_id, consumer_key)
@@ -441,7 +477,7 @@ class WebService
                         unset($desc_internal_id);
                     }
                 }
-                else
+                else   # not a new language
                 {
                     $is_only_language = Db::select_value("
                         select count(*)
@@ -471,9 +507,25 @@ class WebService
                               where cache_id = '".$cache_internal_id_escaped."'
                               and language = '".$language_upper_escaped."'
                           ");
+                          $desc_saved = true;
+                          unset($desc_change_sqls_escaped);
                     }
                     unset($is_only_language);
                 }
+
+                if ($desc_saved)
+                {
+                    # As always, OCPL requires us to do additional housekeeping,
+                    # while OCDE does it via DB trigger. (At least, both sites
+                    # update caches.desc_languages by trigger!)
+                    # 'default_desclang' is a strange feature which controls the
+                    # language of exported GPX data.
+
+                    if (Settings::get('OC_BRANCH') == 'oc.pl') {
+                        $change_sqls_escaped[] = "default_desclang = '".$language_upper_escaped."'";
+                    }
+                }
+                unset($desc_saved);
             }
 
             # attributes

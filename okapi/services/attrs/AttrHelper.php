@@ -182,8 +182,8 @@ class AttrHelper
         ] as $acode => $incompatible_acodes)
         {
             foreach ($incompatible_acodes as $incompatible_acode) {
-                $cachedvalue['attr_dict'][$acode]['incompatible_acodes'][] = $exclude;
-                $cachedvalue['attr_dict'][$exclude]['incompatible_acodes'][] = $acode;
+                $cachedvalue['attr_dict'][$acode]['incompatible_acodes'][] = $incompatible_acode;
+                $cachedvalue['attr_dict'][$incompatible_acode]['incompatible_acodes'][] = $acode;
             }
         }
 
