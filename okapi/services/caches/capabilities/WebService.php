@@ -63,10 +63,12 @@ class WebService
 
         if (in_array('languages', $fields))
         {
+            $cache_key = 'cachecaps/languages';
+            if (self::$language_dict === null) {
+                self::$language_dict = Cache::get($cache_key);
+            }
             if (self::$language_dict === null)
             {
-                # TODO: cache the $language_dict
-
                 $langdict = [];
                 if (Settings::get('OC_BRANCH') == 'oc.pl')
                 {
@@ -93,9 +95,10 @@ class WebService
                         $langdict[$row['lang']][$row['trans_lang']] = $row['name'];
                 }
                 self::$language_dict = $langdict;
+                Cache::set($cache_key, self::$language_dict, 24 * 3600);
             }
 
-            $result['languages'] = self::$language_dict;
+            $result['languages'] = [];
             foreach (self::$language_dict as $lang => $trans)
                 $result['languages'][$lang] = Okapi::pick_best_language($trans, $langprefs);
             asort($result['languages']);
@@ -105,8 +108,11 @@ class WebService
 
         if (in_array('primary_languages', $fields))
         {
-            # TODO: cache the $primary_langs
+            $cache_key = 'cachecaps/primary_languages';
 
+            if (self::$primary_langs === null) {
+                self::$primary_langs = Cache::get($cache_key);
+            }
             if (self::$primary_langs === null)
             {
                 # Get the languages that are used by the most number of owners
@@ -117,7 +123,7 @@ class WebService
                     from cache_desc
                     join caches on caches.cache_id = cache_desc.cache_id
                     where caches.status = 1
-                    and cache_desc.node='".Db::escape_string(Settings::get('OC_NODE_ID'))."'
+                    and caches.node='".Db::escape_string(Settings::get('OC_NODE_ID'))."'
                     group by language
                     order by count desc, language
                 ");
@@ -141,6 +147,14 @@ class WebService
                 unset($total_owners);
             }
             $result['primary_languages'] = self::$primary_langs;
+
+            $timeout = 30 * Db::select_value("
+                select count(*)
+                from caches
+                where status=1
+                and caches.node='".Db::escape_string(Settings::get('OC_NODE_ID'))."'
+            ");
+            Cache::set($cache_key, $result['primary_languages'], $timeout);
         }
 
         # 'password_max_length' field

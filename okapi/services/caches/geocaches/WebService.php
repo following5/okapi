@@ -35,7 +35,8 @@ class WebService
         'country', 'country2', 'state', 'region',
         'preview_image', 'trip_time', 'trip_distance', 'attribution_note','gc_code', 'hint2', 'hints2',
         'protection_areas', 'short_description', 'short_descriptions', 'needs_maintenance',
-        'watchers', 'my_rating', 'is_recommended', 'oc_team_annotation');
+        'watchers', 'my_rating', 'is_recommended', 'oc_team_annotation',
+        'editable_description', 'editable_descriptions');
 
     public static function call(OkapiRequest $request)
     {

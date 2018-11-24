@@ -75,6 +75,8 @@
         description must be supplied as <b>language</b> argument. If a
         description for this language already exists, it will be replaced;
         else a new description will be added.</p>
+        <p><b>Advice:</b> Use the <b>editable_description</b> as returned
+        by service/caches/geocache for editing.</p>
         <p><b>Note:</b> It is <i>recommended</i> to let your user maintain
         descriptions, short descriptions and hints of a cache in "language
         sets", as it is implemented on OC sites. The user will edit all
