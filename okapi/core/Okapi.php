@@ -1428,7 +1428,7 @@ class Okapi
      */
     public static function format_location_readable($location)
     {
-        $coord = parse_location($location);
+        $coord = self::parse_location($location);
         if ($coord === null)
             throw Exception("invalid location format");
         return [

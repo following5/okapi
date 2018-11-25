@@ -101,7 +101,7 @@ class AttrHelper
                 'internal_id' => null,
                 'names' => array(),
                 'descriptions' => array(),
-                'is_addable' => $branch != 'oc.de' || $attrnode['acode'] != 'A75',
+                'is_addable' => !($branch == 'oc.de' && $attrnode['acode'] == 'A75'),
                 'is_discontinued' => true,
             );
             foreach ($attrnode->groundspeak as $gsnode)

@@ -9,8 +9,7 @@
         <p>Note: Some OCPL-based sites support only BMP (Basic Multilingual Plane) Unicode
         characters for textual content. If you submit characters from outside of
         the BMP plane (known as "supplementary planes", they include characters such
-        as smiley symbols), then keep in mind that texts like the cache description
-        might be saved garbled.</p>
+        as smiley symbols), then keep in mind that texts might be saved garbled.</p>
     </desc>
     <req name='cache_code'>
         <p>Code of the geocache.</p>
@@ -21,14 +20,18 @@
     </opt>
     <opt name='old_name'>
         <p>The old cache name to be replaced.</p>
-        <p><b>Note</b>: This argument is needed for compatibility with future OC sites,
-        which may store multiple cache names in different languages. If the
-        supplied string does not match any existing name of the cache, you will
-        receive an HTTP 400 error response.</p>
+        <p><b>Note</b>: This argument is needed for forward compatibility with
+        multilanguage cache names. If the supplied string does not match any
+        existing name of the cache, you will receive an HTTP 400 error response.</p>
     </opt>
     <opt name='location'>
         <p>New location of the cache in the "lat|lon" format (<i>lat</i> and
         <i>lon</i> are in full degrees with a dot as a decimal point).</p>
+
+        <p><b>Note:</b> Most OC installations calculate additional information
+        from the cache location, like altitude or region. These calculations
+        will usually be done some minutes after the location change (by
+        cronjob).</p>
     </opt>
     <opt name='type'>
         <p>New type of the cache; one of the identifiers listed in the <b>types</b>
@@ -67,7 +70,7 @@
         <a href='%OKAPI:methodargref:services/attrs/attribute_index%'>services/attrs/attribute_index</a>
         method with <b>only_locally_used</b>=<b>true</b> to obtain a list of
         available A-codes. You may want to request the <b>incompatible_acodes</b>
-        field and avoid submitting conflicting A-codes. (They would yield a
+        field and avoid to submit conflicting A-codes. (They would yield a
         <b>success</b>=<b>false</b> response.)</p>
     </opt>
     <opt name='description'>
@@ -75,6 +78,10 @@
         The language of the description must be supplied as <b>language</b>
         argument. If a description for this language already exists, it will
         be replaced; else a new description will be added.</p>
+
+        <p><b>Note:</b> If you want to "remove a language" from the cache,
+        submit an empty <b>description</b> <i>and</i> <b>short_description</b>
+        <i>and</i> <b>hint</b> for that language.</p>
     </opt>
     <opt name='short_description'>
         <p>A plaintext string with a new single line (very short) description
@@ -84,15 +91,14 @@
         else a new short description will be added.</p>
 
         <p><b>Note:</b> When submitting a short description in a new language
-        for the cache (there is no long description, short description or hint
-        in that language for this cache), <i>and</i> a long description for
-        the cache exists in another language, then you MUST also include a
-        non-empty <b>description</b> in the same request. This prevents that
-        OC website users of the new language will miss that there also is a
-        long description. If you omit the <b>description</b> in this case,
-        OKAPI will return <b>success</b>=<b>false</b> and a message that
-        prompts the user to also provide a translation of the full
-        description.</p>
+        (there is no long description, short description or hint in that
+        language for this cache), while a long description exists in another
+        language, then the same request should also include a non-empty
+        <b>description</b>. This prevents that OC website users of the new
+        language won't notice the long description. If the <b>description</b>
+        text is missing in this case, OKAPI will return
+        <b>success</b>=<b>false</b> and a message that prompts the user to
+        also provide a translation of the full description.</p>
     </opt>
     <opt name='hint'>
         <p>A plaintext, optional multiline string of cache hints/spoilers;
@@ -110,7 +116,7 @@
         <a href='%OKAPI:methodargref:services/caches/capabilities%'>services/caches/capabilities</a>.</p>
     </opt>
     <opt name='passwd'>
-        <p>The new password for 'Found it' or 'Attended' log entries.
+        <p>A new password for 'Found it' or 'Attended' log entries.
         If you supply an empty string, the password will be cleared, i.e.
         the geocache will not require a log password.</p>
         <p>You may query the maximum accepted password length for the OC site by
@@ -146,11 +152,12 @@
                 </ul>
             </li>
             <li>
-                <p><b>messages</b> - a dictionary of the supplied parameters
-                that were not acceptable, each entry giving a plain-text string
-                that explains the reason of rejection. Each of the strings can
-                consist of multiple lines, separated with newlines (\n). The
-                dictionary is empty in case of success.</p>
+                <p><b>messages</b> - a dictionary (name => message) of the
+                supplied parameters that were not acceptable, each entry
+                giving a plain-text string that explains the reason of
+                rejection. Each of the strings may be multiline, separated
+                with newlines (\n). The dictionary is empty in case of
+                success.</p>
             </li>
         </ul>
         <p>The method responds with an HTTP 400 error if parameters were
