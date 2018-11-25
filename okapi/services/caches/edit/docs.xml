@@ -21,10 +21,10 @@
     </opt>
     <opt name='old_name'>
         <p>The old cache name to be replaced.</p>
-        <p>This argument is for compatibility with future OC sites, which may
-        store multiple cache names in different languages. If the supplied
-        string does not match any existing name of the cache, you will receive
-        an HTTP 400 error response.</p>
+        <p><b>Note</b>: This argument is needed for compatibility with future OC sites,
+        which may store multiple cache names in different languages. If the
+        supplied string does not match any existing name of the cache, you will
+        receive an HTTP 400 error response.</p>
     </opt>
     <opt name='location'>
         <p>New location of the cache in the "lat|lon" format (<i>lat</i> and
@@ -67,28 +67,32 @@
         <a href='%OKAPI:methodargref:services/attrs/attribute_index%'>services/attrs/attribute_index</a>
         method with <b>only_locally_used</b>=<b>true</b> to obtain a list of
         available A-codes. You may want to request the <b>incompatible_acodes</b>
-        field and avoid to submit conflicting A-codes. (They would yield a
+        field and avoid submitting conflicting A-codes. (They would yield a
         <b>success</b>=<b>false</b> response.)</p>
     </opt>
     <opt name='description'>
-        <p>HTML string, new description of the cache. The language of the
-        description must be supplied as <b>language</b> argument. If a
-        description for this language already exists, it will be replaced;
-        else a new description will be added.</p>
-        <p><b>Advice:</b> Use the <b>editable_description</b> as returned
-        by service/caches/geocache for editing.</p>
-        <p><b>Note:</b> It is <i>recommended</i> to let your user maintain
-        descriptions, short descriptions and hints of a cache in "language
-        sets", as it is implemented on OC sites. The user will edit all
-        these three texts on the same page. To delete a "language set",
-        submit empty strings for all three parameters.</p> 
+        <p>HTML string, new description ("long description") of the cache.
+        The language of the description must be supplied as <b>language</b>
+        argument. If a description for this language already exists, it will
+        be replaced; else a new description will be added.</p>
     </opt>
     <opt name='short_description'>
         <p>A plaintext string with a new single line (very short) description
         of the cache (kind of a "tagline text"). The language of the short
-        description must be supplied as <b>language</b> argument. If a
-        short description for this language already exists, it will be
-        replaced; else a new short description will be added.</p>
+        description must be supplied as <b>language</b> argument. If a short
+        description for this language already exists, it will be replaced;
+        else a new short description will be added.</p>
+
+        <p><b>Note:</b> When submitting a short description in a new language
+        for the cache (there is no long description, short description or hint
+        in that language for this cache), <i>and</i> a long description for
+        the cache exists in another language, then you MUST also include a
+        non-empty <b>description</b> in the same request. This prevents that
+        OC website users of the new language will miss that there also is a
+        long description. If you omit the <b>description</b> in this case,
+        OKAPI will return <b>success</b>=<b>false</b> and a message that
+        prompts the user to also provide a translation of the full
+        description.</p>
     </opt>
     <opt name='hint'>
         <p>A plaintext, optional multiline string of cache hints/spoilers;
@@ -96,6 +100,8 @@
         must be supplied as <b>language</b> argument. If a hint for this
         language already exists, it will be replaced; else a new hint will
         be added.</p>
+        <p>See the notes for <b>short_description</b>; it's the same for the
+        hint.</p>
     </opt>
     <opt name='language'>
         <p>The language of the given <b>short_description</b>, <b>description</b>

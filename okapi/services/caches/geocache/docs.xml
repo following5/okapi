@@ -387,8 +387,7 @@
                 intended for
                 <a href="%OKAPI:methodargref:services/caches/edit%">editing</a>.</p>
                 <p>This information is only accessible for the cache owner through
-                level 3 authentication; otherwise <b>null</b> will be returned
-                instead of the text.</p>
+                level 3 authentication; otherwise <b>null</b> will be returned.</p>
             </li>
             <li>
                 <p><b>editable_descriptions</b> - a dictionary (language code =&gt;
@@ -397,8 +396,7 @@
                 intended for
                 <a href="%OKAPI:methodargref:services/caches/edit%">editing</a>.</p>
                 <p>This information is only accessible for the cache owner through
-                level 3 authentication; otherwise <b>null</b> will be returned
-                instead of each text.</p>
+                level 3 authentication; otherwise <b>null</b> will be returned.</p>
             </li>
             <li class="deprecated">
                 <b>hint</b> - <a href='%OKAPI:docurl:html%'>HTML-encoded</a>

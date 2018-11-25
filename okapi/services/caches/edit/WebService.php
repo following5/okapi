@@ -27,8 +27,9 @@ class WebService
     public static function call(OkapiRequest $request)
     {
         $cache_code = $request->get_parameter('cache_code');
-        if ($cache_code == null)
+        if ($cache_code == null) {
             throw new ParamMissing('cache_code');
+        }
         $cache = OkapiServiceRunner::call(
             'services/caches/geocache',
             new OkapiInternalRequest(
@@ -36,6 +37,7 @@ class WebService
                 $request->token,
                 array(
                     'cache_code' => $cache_code,
+                    'langpref' => $request->get_parameter('language'),
                     'fields' => 'internal_id|type|date_created|location|type|size2|difficulty|terrain|trip_time|trip_distance|attr_acodes|names|name|req_passwd'
                 )
             )
@@ -50,8 +52,9 @@ class WebService
                 . " imported from another OC node. OKAPI is not prepared for that."
             );
         }
-        if ($cache_internal['user_id'] != $request->token->user_id)
+        if ($cache_internal['user_id'] != $request->token->user_id) {
             throw new BadRequest("Only own caches may be edited.");
+        }
 
         $problems = [];
         $change_sqls_escaped = [];
@@ -155,7 +158,7 @@ class WebService
             foreach (['difficulty', 'terrain'] as $property)
             {
                 $tmp = $request->get_parameter($property);
-                if ($tmp != null)
+                if ($tmp !== null)
                 {
                     if (!preg_match('/^[0-9](\.[05]0*)?$/', $tmp))
                         throw new InvalidParam($property);
@@ -173,7 +176,7 @@ class WebService
                 as $property => $db_field_sql
             ) {
                 $tmp = $request->get_parameter($property);
-                if ($tmp != null)
+                if ($tmp !== null)
                 {
                     # OC websites can handle numbers >= 0.01 for both properties,
                     # so we accept only those. Also impose some reasonable upper limit
@@ -350,9 +353,9 @@ class WebService
             $description = $request->get_parameter('description');
             $short_description = $request->get_parameter('short_description');
             $hint = $request->get_parameter('hint');
-            $desc_changes = ($description !== null || $short_description !== null || $hint !== null);
+            $desc_params_given = ($description !== null || $short_description !== null || $hint !== null);
 
-            if ($desc_changes)
+            if ($desc_params_given)
             {
                 $language = $request->get_parameter('language');
                 if ($language === null) {
@@ -369,8 +372,12 @@ class WebService
                 # purify/trim/encode texts
 
                 if ($description != '') {
-                    list($description, $value_for_desc_html_field)
-                        = Okapi::purify_html($description);
+                    list($description, $value_for_desc_html_field) = Okapi::purify_html($description);
+                } else {
+                    # This avoid to change null => '', and to make the assumption
+                    # purify_html('') == ''.
+
+                    list($dummy, $value_for_desc_html_field) = Okapi::purify_html('');
                 }
                 if ($short_description != '') {
                     $short_description = preg_replace('/[\r\n\t]+/', ' ', $short_description);
@@ -384,7 +391,11 @@ class WebService
                     $hint = nl2br($hint);
                 }
 
-                # validate texts
+                # validate
+
+                # We won't use information returned by services/caches/geocaches
+                # here, to avoid assumptions on how that method processes
+                # descriptions and hints.
 
                 $language_upper_escaped = Db::escape_string(strtoupper($language));
                 $is_new_language = !Db::select_value("
@@ -393,15 +404,41 @@ class WebService
                     and language ='".$language_upper_escaped."'
                     limit 1
                 ");
-                if ($is_new_language && $description.$short_description.$hint == '')
+                if ($is_new_language)
                 {
-                    # Return messages with priority in mostly used field.
-                    if ($description !== null)
-                        $problems['description'] = _("Please enter some text.");
-                    elseif ($hint !== null)
-                        $problems['hint'] = _("Please enter some text.");
-                    else
-                        $problems['short_description'] = _("Please enter some text.");
+                    if ($description.$short_description.$hint == '')
+                    {
+                        # Return messages with priority in mostly used field.
+                        if ($description !== null)
+                            $problems['description'] = _("Please enter some text.");
+                        elseif ($hint !== null)
+                            $problems['hint'] = _("Please enter some text.");
+                        else
+                            $problems['short_description'] = _("Please enter some text.");
+                    }
+                    elseif ($description == '')
+                    {
+                        # We don't allow to submit a translation only of short
+                        # description and/or hint, because OC websites users of
+                        # this language wouldn't notice that there also is a
+                        # full description. See also the method docs.
+
+                        if (Db::select_value("
+                            select 1 from cache_desc
+                            where cache_id = '".$cache_internal_id_escaped."'
+                            and trim(desc) != ''
+                            limit 1
+                        ")) {
+                            if ($short_description != '') {
+                                $problems['short_description'] = _(
+                                    "Please also translate the full description text, ".
+                                    "not just the short description."
+                                );
+                            } else {
+                                $problems['hint'] = _("Please also translate the description.");
+                            }
+                        }
+                    }
                 }
             }
 
@@ -415,15 +452,14 @@ class WebService
 
         # save changes
 
-        if (!$problems && ($change_sqls_escaped || $acodes_to_add || $acodes_to_remove || $desc_changes))
+        if (!$problems && ($change_sqls_escaped || $acodes_to_add || $acodes_to_remove || $desc_params_given))
         {
             Db::execute("start transaction");
 
             # description, short_description, hint
 
-            if ($desc_changes)
+            if ($desc_params_given)
             {
-                $desc_saved = false;
                 if ($is_new_language)
                 {
                     # There is a slight chance that since calculation of $is_new_language,
@@ -464,7 +500,6 @@ class WebService
                                 now()
                             )
                         ");
-                        $desc_saved = true;
                         $desc_internal_id = Db::last_insert_id();
                         Db::execute("
                             insert into okapi_submitted_objects (object_type, object_id, consumer_key)
@@ -479,13 +514,33 @@ class WebService
                 }
                 else   # not a new language
                 {
+                    # We won't use information returned by services/caches/geocaches
+                    # here, to avoid assumptions on how that method processes
+                    # descriptions and hints.
+
                     $is_only_language = Db::select_value("
                         select count(*)
                         from cache_desc
                         where cache_id = '".$cache_internal_id_escaped."'
                     ") <= 1;
-                    if (!$is_only_language && $description.$short_description.$hint == '')
+                    if (!$is_only_language)
                     {
+                        $row = Db::select_row("
+                            select desc, short_desc, hint
+                            from cache_desc
+                            where cache_id = '".$cache_internal_id_escaped."'
+                            and language='".$language_upper_escaped."'
+                        ");
+                        $effective_desc =
+                            $description !== null ? $description : trim($row['desc']);
+                        $effective_short_desc =
+                            $short_description !== null ? $short_description : trim($row['short_desc']);
+                        $effective_hint =
+                            $hint !== null ? $hint : trim($row['hint']);
+                    }
+                    if (!$is_only_language
+                        && $effective_desc.$effective_short_desc.$effective_hint == ''
+                    ) {
                         Db::execute("
                             delete from cache_desc
                             where cache_id = '".$cache_internal_id_escaped."'
@@ -494,38 +549,48 @@ class WebService
                     }
                     else
                     {
-                          $desc_change_sqls_escaped = [];
-                          if ($description !== null)
-                              $desc_change_sqls_escaped[] = "`desc` = '".Db::escape_string($description)."'";
-                          if ($short_description !== null)
-                              $desc_change_sqls_escaped[] = "short_desc = '".Db::escape_string($short_description)."'";
-                          if ($hint !== null)
-                              $desc_change_sqls_escaped[] = "hint = '".Db::escape_string($hint)."'";
-                          Db::execute("
-                              update cache_desc
-                              set ".implode(", ", $desc_change_sqls_escaped)."
-                              where cache_id = '".$cache_internal_id_escaped."'
-                              and language = '".$language_upper_escaped."'
-                          ");
-                          $desc_saved = true;
-                          unset($desc_change_sqls_escaped);
+                        $desc_change_sqls_escaped = ["last_modified = now()"];
+                        if ($description !== null)
+                            $desc_change_sqls_escaped[] = "`desc` = '".Db::escape_string($description)."'";
+                        if ($short_description !== null)
+                            $desc_change_sqls_escaped[] = "short_desc = '".Db::escape_string($short_description)."'";
+                        if ($hint !== null)
+                            $desc_change_sqls_escaped[] = "hint = '".Db::escape_string($hint)."'";
+                        Db::execute("
+                            update cache_desc
+                            set ".implode(", ", $desc_change_sqls_escaped)."
+                            where cache_id = '".$cache_internal_id_escaped."'
+                            and language = '".$language_upper_escaped."'
+                        ");
+                        unset($desc_change_sqls_escaped);
                     }
                     unset($is_only_language);
+                    unset($effective_desc);
+                    unset($effective_short_desc);
+                    unset($effective_hint);
                 }
 
-                if ($desc_saved)
-                {
-                    # As always, OCPL requires us to do additional housekeeping,
-                    # while OCDE does it via DB trigger. (At least, both sites
-                    # update caches.desc_languages by trigger!)
-                    # 'default_desclang' is a strange feature which controls the
-                    # language of exported GPX data.
+                # Finally, update the cache's default language. OC sites use
+                # this language for GPX export. Note that OCDE has updated it
+                # via trigger, but only using one default language. We can do
+                # better (if OCDE provides a SITELANGS list; else we just
+                # repeat what the OCDE trigger did).
 
-                    if (Settings::get('OC_BRANCH') == 'oc.pl') {
-                        $change_sqls_escaped[] = "default_desclang = '".$language_upper_escaped."'";
+                $cache_desclangs = Db::select_value("
+                    select desc_languages
+                    from cache
+                    where cache_id = '".$cache_internal_id_escaped."'
+                ");
+                $cache_default_desclang = substr($cache_desclangs, 0, 2);
+
+                foreach (Settings::get('SITELANGS') as $sitelang) {
+                    if (strpos($cache_desclangs, strtoupper($sitelang)) !== false) {
+                        $cache_default_desclang = strtoupper($sitelang);
+                        break;
                     }
                 }
-                unset($desc_saved);
+                $change_sqls_escaped[] =
+                    "default_desclang = '".Db::escape_string($cache_default_desclang)."'";
             }
 
             # attributes
