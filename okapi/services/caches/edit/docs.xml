@@ -90,15 +90,15 @@
         description for this language already exists, it will be replaced;
         else a new short description will be added.</p>
 
-        <p><b>Note:</b> When submitting a short description in a new language
-        (there is no long description, short description or hint in that
-        language for this cache), while a long description exists in another
-        language, then the same request should also include a non-empty
-        <b>description</b>. This prevents that OC website users of the new
-        language won't notice the long description. If the <b>description</b>
-        text is missing in this case, OKAPI will return
-        <b>success</b>=<b>false</b> and a message that prompts the user to
-        also provide a translation of the full description.</p>
+        <p><b>Note:</b> When submitting a short description in a completely
+        new language (there is no long description, short description or
+        hint in that language for this cache), while a long description
+        exists in another language, then the same request should also include
+        a non-empty <b>description</b>. This prevents that OC website users
+        of the new language won't notice that there also is a long description.
+        If the <b>description</b> text is missing in this case, OKAPI will
+        return <b>success</b>=<b>false</b> and a message that prompts the user
+        to also provide a translation of the full description.</p>
     </opt>
     <opt name='hint'>
         <p>A plaintext, optional multiline string of cache hints/spoilers;
@@ -106,7 +106,7 @@
         must be supplied as <b>language</b> argument. If a hint for this
         language already exists, it will be replaced; else a new hint will
         be added.</p>
-        <p>See the notes for <b>short_description</b>; it's the same for the
+        <p>See the note for <b>short_description</b>; it's the same for the
         hint.</p>
     </opt>
     <opt name='language'>

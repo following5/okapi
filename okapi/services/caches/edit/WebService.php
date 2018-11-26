@@ -11,6 +11,7 @@ use okapi\core\Exception\ParamMissing;
 use okapi\core\Request\OkapiRequest;
 use okapi\core\Request\OkapiInternalRequest;
 use okapi\core\OkapiServiceRunner;
+use okapi\lib\OCPLSignals;
 use okapi\Settings;
 use okapi\services\attrs\AttrHelper;
 
@@ -38,7 +39,7 @@ class WebService
                 array(
                     'cache_code' => $cache_code,
                     'langpref' => $request->get_parameter('language'),
-                    'fields' => 'internal_id|type|date_created|location|type|size2|difficulty|terrain|trip_time|trip_distance|attr_acodes|names|name|req_passwd'
+                    'fields' => 'internal_id|location|type|size2|difficulty|terrain|trip_time|trip_distance|attr_acodes|names|name|date_created|req_passwd|gc_code'
                 )
             )
         );
@@ -53,7 +54,7 @@ class WebService
             );
         }
         if ($cache_internal['user_id'] != $request->token->user_id) {
-            throw new BadRequest("Only own caches may be edited.");
+            throw new InvalidParam('cache_code', "Only own caches may be edited.");
         }
 
         $problems = [];
@@ -71,12 +72,12 @@ class WebService
             $name = $request->get_parameter('name');
             if ($name !== null) {
                 $old_name = $request->get_parameter('old_name');
-                if ($old_name === null)
+                if (!$old_name)
                     throw new ParamMissing('old_name');
                 elseif (count($cache['names']) != 1)
                     throw new Exception("Unexpected cache name count");
                 elseif ($old_name != $cache['name'])
-                    throw new InvalidParam('old_name', "'".$old_name."' does not match the cache name.");
+                    throw new InvalidParam('old_name', "'".$old_name."' does not match the cache name ('".$cache['name']."').");
                 elseif (trim($name) == '')
                     $problems['name'] = _("The cache name must not be empty.");
                 elseif ($name != $cache['name'])
@@ -88,7 +89,7 @@ class WebService
             $type = $request->get_parameter('type');
             if ($type !== null) {
                 if (!in_array($type, Okapi::get_local_cachetypes()))
-                    throw new InvalidParam('type');
+                    throw new InvalidParam('type', "'".$type."' is not a valid cache type (at this OC site).");
                 elseif ($type != $cache['type'])
                     $change_sqls_escaped[] = "type = ".Okapi::cache_type_name2id($type);
             } else {
@@ -100,18 +101,19 @@ class WebService
                 new OkapiInternalRequest(
                     $request->consumer,
                     $request->token,
-                    ['type' => $type, 'fields' => 'sizes|password_max_length']
+                    ['cache_type' => $type, 'fields' => 'sizes|password_max_length']
                 )
             );
 
             # location
 
             $location = $request->get_parameter('location');
+            $location_update = false;
             if ($location !== null)
             {
                 $coords = Okapi::parse_location($location);
                 if ($coords === null)
-                    throw new InvalidParam('location');
+                    throw new InvalidParam('location', "'".$location."' is no valid 'lat|lon' pair.");
                 elseif ($coords[0] < -90 || $coords[0] > 90)
                     $problems['location'] = _("Latitude degrees must range between -90 and 90.");
                 elseif ($coords[1] < -180 || $coords[1] > 180)
@@ -122,9 +124,10 @@ class WebService
                     $old_coords = Okapi::parse_location($cache['location']);
                     if ($coords != $old_coords) {
                         $change_sqls_escaped[] = "
-                            latitude='".Db::escape_float($coords[0])."',
-                            longitude='".Db::escape_float($coords[1])."'
+                            latitude = ".Db::float_sql($coords[0]).",
+                            longitude = ".Db::float_sql($coords[1])."
                         ";
+                        $location_update = true;
                     }
                 }
                 unset($old_coords);
@@ -136,12 +139,17 @@ class WebService
             $size = $request->get_parameter('size');
             if ($size !== null)
             {
-                if (!in_array($size, Okapi::get_local_cache_sizes()))
-                    throw new InvalidParam('size');
-                elseif (!in_array($size, $capabilities['sizes']))
-                    $problems['size'] = _("This size is not available for this type of cache.");
-                elseif ($size != $cache['size2'])
-                    $change_sqls_escaped[] = "size = ".Okapi::cache_size2_to_sizeid($size);
+                # We allow to confirm an existing size, even if it is no longer
+                # available for the cache's type. OC websites do the same.
+
+                if ($size != $cache['size2']) {
+                    if (!in_array($size, Okapi::get_local_cachesizes()))
+                        throw new InvalidParam('size', "'".$size."' is not a valid cache size (at this OC site).");
+                    elseif (!in_array($size, $capabilities['sizes']))
+                        $problems['size'] = _("This size is not available for this type of cache.");
+                    else
+                        $change_sqls_escaped[] = "size = ".Okapi::cache_size2_to_sizeid($size);
+                }
             }
             elseif ($type !== $cache['type'] && !in_array($cache['size2'], $capabilities['sizes']))
             {
@@ -161,9 +169,9 @@ class WebService
                 if ($tmp !== null)
                 {
                     if (!preg_match('/^[0-9](\.[05]0*)?$/', $tmp))
-                        throw new InvalidParam($property);
+                        throw new InvalidParam($property, "'".$tmp."' is not a valid ".$property." value");
                     elseif (!in_array($tmp, [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]))
-                        throw new InvalidParam($property);
+                        throw new InvalidParam($property, "'".$tmp."' is not a valid ".$property." value");
                     elseif (2 * $tmp != $cache[$property])
                         $change_sqls_escaped[] = $property." = ".(2 * $tmp);
                 }
@@ -185,7 +193,7 @@ class WebService
                     $max_value = max($cache[$property], $property == 'trip_time' ? 999 : 99999);
 
                     if (!preg_match('/^(null|[0-9]+\.?[0-9]*)$/', $tmp)) {
-                        throw new InvalidParam($property);
+                        throw new InvalidParam($property, "'".$tmp."' is not a valid ".$property." value");
                     } elseif ($tmp != 'null' && ($tmp < 0.01 || $tmp > $max_value)) {
                         $problems[$property] = (
                             $property == 'trip_time'
@@ -193,7 +201,7 @@ class WebService
                             : sprintf(_("Invalid trip distance; must range between 0.01 and %d km."), $max_value)
                         );
                     } else {
-                        $change_sqls_escaped[] = $db_field_sql." = ".(0 + $tmp);  # 'null' => 0
+                        $change_sqls_escaped[] = $db_field_sql." = ".Db::float_sql($tmp + 0);  # 'null' => 0
                     }
                     unset($max_value);
                 }
@@ -241,7 +249,7 @@ class WebService
                 $problems['type'] = sprintf(
                     _('%s does not allow log passwords for traditional caches.'),
                     Okapi::get_normalized_site_name()
-                ) . _("Please choose another cache type or remove the password.");
+                ) . " "._("Please choose another cache type or remove the password.");
             }
 
             # gc_code
@@ -263,7 +271,7 @@ class WebService
 
                 if (!preg_match('/^(|^GC[0-9A-HJKMNPQRTV-Z]{2,})$/', $gc_code))
                     $problems['gc_code'] = _("Invalid GC code");
-                else
+                elseif ($gc_code != $cache['gc_code'])
                     $change_sqls_escaped[] = "wp_gc = '".Db::escape_string($gc_code)."'";
             }
 
@@ -298,7 +306,7 @@ class WebService
                     if ($remove)
                         $acode = substr($acode, 1);
                     if (!isset($available_acodes[$acode]))
-                        throw new InvalidParam('attributes', "Invalid A-code: '".$acode."'");
+                        throw new InvalidParam('attributes', "'".$acode."' is not a valid A-code (at this OC site).");
                     if ($remove)
                         $acodes_to_remove[] = $acode;
                     elseif ($available_acodes[$acode]['is_addable'])
@@ -348,6 +356,9 @@ class WebService
                 unset($attr_problems);
             }
 
+            # Note: We allow to combine A1 attribute & GC code, because this
+            # is valid if the GC cache is archived (which we cannot validate).
+
             # descriptions and hint
 
             $description = $request->get_parameter('description');
@@ -364,10 +375,13 @@ class WebService
                 $tmp = OkapiServiceRunner::call(
                     'services/caches/capabilities',
                     new OkapiInternalRequest(
-                        $request->consumer, $request->token, ['fields' => 'languages'])
-                    );
+                        $request->consumer,
+                        $request->token,
+                        ['cache_type' => $type, 'fields' => 'languages']
+                    )
+                );
                 if (!isset($tmp['languages'][$language]))
-                    throw new InvalidParam('language', "Invalid language code: '".$language."'");
+                    throw new InvalidParam('language', "'".$language."' is not a valid language code.");
 
                 # purify/trim/encode texts
 
@@ -391,7 +405,7 @@ class WebService
                     $hint = nl2br($hint);
                 }
 
-                # validate
+                # validate descriptions and hint
 
                 # We won't use information returned by services/caches/geocaches
                 # here, to avoid assumptions on how that method processes
@@ -634,6 +648,9 @@ class WebService
                     set ".implode(", ", $change_sqls_escaped)."
                     where cache_id = '".$cache_internal_id_escaped."'
                 ");
+            }
+            if ($location_update) {
+                OCPLSignals::cache_location_changed($cache['internal_id']);
             }
 
             Db::execute("commit");
