@@ -32,7 +32,7 @@ class WebService
         'my_notes', 'trackables_count', 'trackables', 'alt_wpts', 'last_found',
         'last_modified', 'date_created', 'date_hidden', 'internal_id', 'is_watched',
         'is_ignored', 'willattends',
-        'country', 'country2', 'state', 'region',
+        'country', 'country2', 'country_code', 'state', 'region', 'region_code',
         'preview_image', 'trip_time', 'trip_distance', 'attribution_note','gc_code', 'hint2', 'hints2',
         'protection_areas', 'short_description', 'short_descriptions', 'needs_maintenance',
         'watchers', 'my_rating', 'is_recommended', 'oc_team_annotation',
@@ -1477,7 +1477,17 @@ class WebService
             }
             if (in_array('state', $fields)) {
                 foreach ($results as $cache_code => &$row_ref)
-                    $row_ref['state'] = isset($states[$cache_code]) ? $states[$cache_code] : null;
+                    $row_ref['state'] = isset($regions[$cache_code]) ? $regions[$cache_code] : null;
+            }
+            if (in_array('region', $fields))
+            {
+                foreach ($results as $cache_code => &$row_ref)
+                    $row_ref['region'] = isset($regions[$cache_code]) ? $regions[$cache_code] : null;
+            }
+            if (in_array('region_code', $fields))
+            {
+                foreach ($results as $cache_code => &$row_ref)
+                    $row_ref['region_code'] = isset($region_codes[$cache_code]) ? $region_codes[$cache_code] : null;
             }
             if (in_array('region', $fields)) {
                 foreach ($results as $cache_code => &$row_ref)
@@ -1495,6 +1505,8 @@ class WebService
             unset($country_codes2names);
             unset($broken_okapi_country_field);
         }
+        unset($state_requested);
+        unset($region_requested);
 
         # Attribution note
 

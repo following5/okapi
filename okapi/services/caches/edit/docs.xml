@@ -25,13 +25,36 @@
         existing name of the cache, you will receive an HTTP 400 error response.</p>
     </opt>
     <opt name='location'>
-        <p>New location of the cache in the "lat|lon" format (<i>lat</i> and
+        <p>New coordinates of the cache in the "lat|lon" format (<i>lat</i> and
         <i>lon</i> are in full degrees with a dot as a decimal point).</p>
 
+        <p><b>Note:</b> If you allow your user to freely edit the cache
+        location, then you MUST also allow to edit the country and - if your
+        application is intended to be used with OCPL-based sites - the region
+        (see below).</p>
+
         <p><b>Note:</b> Most OC installations calculate additional information
-        from the cache location, like altitude or region. These calculations
+        from the cache coordinates, like altitude or region. These calculations
         will usually be done some minutes after the location change (by
         cronjob).</p>
+    </opt>
+    <opt name='country_code'>
+        <p>The country where the cache is located; one of the country codes
+        listed in the <b>countries</b> field of
+        <a href='%OKAPI:methodargref:services/caches/capabilities%'>services/caches/capabilities</a>.</p>
+    </opt>
+    <opt name='region_code' infotags='ocpl-specific'>
+        <p>The region where the cache is located; one of the region codes
+        of the cache's country that are listed in the <b>regions</b> field of
+        <a href='%OKAPI:methodargref:services/caches/capabilities%'>services/caches/capabilities</a>
+        (if any), or <b>null</b> for "no region specified".</p>
+        <p><b>Note:</b> Some installations will automatically calculate the
+        region frome cache coordinates (usually with some minutes delay).
+        These installations will <i>ignore</i> the <b>region</b> parameter.
+        You can detect those installations by the <b>can_set_region</b>
+        field of
+        <a href='%OKAPI:methodargref:services/caches/capabilities%'>services/caches/capabilities</a>
+        being <b>false</b>.</p>
     </opt>
     <opt name='type'>
         <p>New type of the cache; one of the identifiers listed in the <b>types</b>

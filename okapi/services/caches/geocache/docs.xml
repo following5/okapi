@@ -574,6 +574,21 @@
                 where the cache is placed.</p>
             </li>
             <li>
+<<<<<<< HEAD
+=======
+                <p><b>country_code</b> - an identifier of the country the cache is
+                placed in, or <b>null</b> if the country is unknown. The country
+                code  is provided only for
+                <a href='%OKAPI:methodargref:services/caches/edit%'>editing</a>
+                the cache's country, and it is only valid on the OC installation
+                that returned it (other installations may use other codes for
+                the same country.)</p>
+            </li>
+            <li>
+                <p><b>state</b> - same as <b>region.</b></p>
+            </li>
+            <li>
+>>>>>>> added draft implementation of editing cache country/region
                 <p><b>region</b> - name of the major subnational entity the cache
                 is placed in; may be empty ("") if the entity is unknown. This may
                 be a (federal) state, a province, a region or whatever is the
@@ -587,6 +602,15 @@
                 currently you have no way of knowing in which language it will appear
                 in (but it *may* start to vary on the value of your <b>langpref</b>
                 parameter in the future).</p>
+            </li>
+            <li>
+                <p><b>region_code</b> - an identifier of the major subnational entity
+                the cache is placed in, or <b>null</b> if the entitiy is unknown.
+                The region code is provided only for
+                <a href='%OKAPI:methodargref:services/caches/edit%'>editing</a> the
+                cache's region, and it is only valid for the OC installation that
+                returned it (other installations may use other codes for the same
+                region).</p>
             </li>
             <li>
                 <p><b>protection_areas</b> - list of dictionaries, each representing a

@@ -39,7 +39,7 @@ class WebService
                 array(
                     'cache_code' => $cache_code,
                     'langpref' => $request->get_parameter('language'),
-                    'fields' => 'internal_id|location|type|size2|difficulty|terrain|trip_time|trip_distance|attr_acodes|names|name|date_created|req_passwd|gc_code'
+                    'fields' => 'internal_id|location|country_code|region_code|type|size2|difficulty|terrain|trip_time|trip_distance|attr_acodes|names|name|date_created|req_passwd|gc_code'
                 )
             )
         );
@@ -96,14 +96,42 @@ class WebService
                 $type = $cache['type'];
             }
 
+            # query capabilities -- DEPENDS ON TYPE
+
+            $capabilites_needed = [
+                'country_code' => ['countries', 'regions'],
+                'region_code' => ['countries', 'regions'],
+                'type' => ['sizes'],
+                'size2' => ['sizes'],
+                'description' => ['languages'],
+                'short_description' => ['languages'],
+                'hint2' => ['languages'],
+                'passwd' => ['password_max_length'],
+            ];
+            $cap_fields = [];
+            foreach ($request->get_all_parameters_including_unknown() as $param => $dummy) {
+                if (isset($capabilites_needed[$param]))
+                    foreach ($capabilites_needed[$param] as $field)
+                        $cap_fields[$field] = true;
+            }
             $capabilities = OkapiServiceRunner::call(
                 'services/caches/capabilities',
                 new OkapiInternalRequest(
                     $request->consumer,
                     $request->token,
-                    ['cache_type' => $type, 'fields' => 'sizes|password_max_length']
+                    [
+                        'cache_type' => $type,
+                        'langpref' => $langpref,
+                            # This determines the language for cache_location.adm1,
+                            # if the country is changed. It's weird to derive it from
+                            # the langpref, but 1. that's what OC code does, and 2.
+                            # the field is obsolete anyway; see comments below.
+                        'fields' => implode('|', array_keys($cap_fields))
+                    ]
                 )
             );
+            unset($cap_fields);
+            unset($capabilites_needed);
 
             # location
 
@@ -133,6 +161,75 @@ class WebService
                 unset($old_coords);
                 unset($coords);
             }
+
+            # country and region
+
+            $country_or_region_change = false;
+
+            $country_code = $request->get_parameter('country_code');
+            if ($country_code !== null)
+            {
+                if ($country_code != $cache['country_code']) {
+                    if (!in_array($country_code, array_keys($capabilities['countries']))) {
+                        throw new InvalidParam('country', "'".$country_code."' is no valid country code.");
+                    }
+                    $change_sqls_escaped[] = "country = '".Db::escape_string($country_code)."'";
+                    $country_or_region_change = true;
+                }
+            }
+            else
+            {
+                $country_code = $cache['country_code'];
+            }
+
+            if (Settings::get('OC_BRANCH') == 'oc.pl')
+            {
+                $region_code = $request->get_parameter('region_code');
+                if ($region_code !== null)
+                {
+                    if ($region_code == 'null') {
+                        $region_code = null;
+                    } else if ($region_code != $cache['region_code']) {
+
+                        if (!isset($capabilities['regions'][substr($region_code, 0, 2)][$region_code]))
+                            throw new InvalidParam('region', "'".$region_code."' is no valid region code.");
+                        $effective_country_code =
+                            ($country_code !== null ? $country_code : $cache['country_code']);
+                        if (substr($region_code, 0, 2) != $effective_country_code) {
+                            throw new InvalidParam(
+                                'region',
+                                "'".$region_code."' is not a valid region code for this country."
+                            );
+                        }
+                    }
+                }
+                else
+                {
+                    $region_code = $cache['region_code'];
+
+                    # If the cache country is changed without providing a new region code,
+                    # then we either assign the sole region code for the country, or clear
+                    # the region.
+
+                    if ($country_code !== null && $country_code != $cache['country_code'])
+                    {
+                        if (isset($capabilities['regions'][$country_code])
+                            && count($capabilities['regions'][$country_code]) == 1
+                        ) {
+                            reset($capabilities['regions'][$country_code]);
+                            $region_code = key($capabilities['regions'][$country_code]);
+                        } else {
+                            $region_code = null;
+                        }
+                    }
+                }
+                if ($region_code !== $cache['region_code']) {
+                    $country_or_region_change = true;
+                }
+            }
+
+            # $country_code and $region_code now both have the correct values for
+            # storing them into the 'cache_location' table.
 
             # size2 -- DEPENDS ON TYPE
 
@@ -371,18 +468,9 @@ class WebService
             if ($desc_params_given)
             {
                 $language = $request->get_parameter('language');
-                if ($language === null) {
+                if ($language === null)
                     throw new ParamMissing('language');
-                }
-                $tmp = OkapiServiceRunner::call(
-                    'services/caches/capabilities',
-                    new OkapiInternalRequest(
-                        $request->consumer,
-                        $request->token,
-                        ['cache_type' => $type, 'fields' => 'languages']
-                    )
-                );
-                if (!isset($tmp['languages'][$language]))
+                if (!isset($capabilities['languages'][$language]))
                     throw new InvalidParam('language', "'".$language."' is not a valid language code.");
 
                 # purify/trim/encode texts
@@ -468,7 +556,7 @@ class WebService
 
         # save changes
 
-        if (!$problems && ($change_sqls_escaped || $acodes_to_add || $acodes_to_remove || $desc_params_given))
+        if (!$problems && ($change_sqls_escaped || $acodes_to_add || $acodes_to_remove || $desc_params_given || $country_or_region_change))
         {
             Db::execute("start transaction");
 
@@ -599,6 +687,9 @@ class WebService
                 # better (if OCDE provides a SITELANGS list; else we just
                 # repeat what the OCDE trigger did).
 
+                # The desc_languages field has been updated on both branches
+                # via trigger.
+
                 $cache_desclangs = Db::select_value("
                     select desc_languages
                     from caches
@@ -643,6 +734,50 @@ class WebService
                 }
                 unset($ids_to_remove_escaped);
                 unset($acode2id);
+            }
+
+            # country/region; OCDE calculates them by cronjob
+
+            if ($country_or_region_change && Settings::get('OC_BRANCH') == 'oc.pl')
+            {
+                # Note that the cache_location.adm1 value is obsolete.
+                # Both OCPL and OCDE websites correctly generate the name
+                # from code1.
+
+                # For the case that we are processing bad codes that were
+                # fetched from OC database and passed on, fallback to "?".
+
+                $code1_escaped = Db::escape_string($country_code);
+                $adm1_escaped = Db::escape_string(
+                    isset($capabilities['countries'][$country_code])
+                    ? $capabilities['countries'][$country_code] : "?"
+                );
+                if ($region_code === null) {
+                    $code3_escaped_quoted = 'null';
+                    $adm3_escaped_quoted = 'null';
+                } else {
+                    $code3_escaped_quoted = "'".Db::escape_string($region_code)."'";
+                    $adm3_escaped_quoted = "'".Db::escape_string(
+                        isset($capabilities['regions'][$country_code][$region_code])
+                        ? $capabilities['regions'][$country_code][$region_code] : "?"
+                    )."'";
+                }
+
+                Db::execute("
+                    insert into cache_location (
+                        cache_id, code1, adm1, code3, adm3
+                    ) values (
+                        '".$cache_internal_id_escaped."',
+                        '".$code1_escaped."',
+                        '".$adm1_escaped."',
+                        ".$code3_escaped_quoted.",
+                        ".$adm3_escaped_quoted."
+                    ) on duplicate key update
+                        code1 = '".$code1_escaped."',
+                        adm1 = '".$adm1_escaped."',
+                        code3 = ".$code3_escaped_quoted.",
+                        adm3 = ".$adm3_escaped_quoted."
+                ");
             }
 
             # other changes

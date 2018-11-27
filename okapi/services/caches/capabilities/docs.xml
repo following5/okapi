@@ -19,8 +19,10 @@
     </opt>
     <opt name='langpref' default='en'>
         <p>Pipe-separated list of ISO 639-1 language codes. This indicates the
-        order of preference in which language will be chosen for the language
-        names in field <b>languages</b>.</p>
+        order of preference in which language will be chosen for the names in
+        fields <b>languages</b> and <b>countries</b>. Note that this option is
+        <i>ignored</i> for the <b>regions</b> field, which will return each
+        name in local language.</p>
     </opt>
     <opt name='cache_type'>
         <p>One of the cache type indentifiers returned in the <b>types</b>
@@ -65,8 +67,34 @@
                 <p><b>primary_languages</b> - a list of codes of the preferred or
                 mostly used languages at this OC site, ordered descending by
                 relevance.  You may suggest this set of languages first when your
-                user edits cache data (we recommend to present them in alphabetical
-                order).</p>
+                user edits cache descriptions (we recommend to present them in
+                alphabetical order).</p>
+            </li>
+            <li>
+                <p><b>countries</b> - a dictionary (country code => name) of
+                countries that can be assigned to geocache listings.</p>
+            </li>
+            <!-- li>
+                <p><b>primary_countries</b> - a list of codes of the countries
+                that are primarily served by this installation, ordered
+                descending by relevance. You may suggest this set of countries
+                first when your user edits cache descriptions (we recommend to
+                present them in alphabetical order).</p>
+            </li -->
+            <li>
+                <p><b>regions</b> - a dictionary (country code => region) of
+                dictionaries (region code => name) of regions that can be
+                assigned to geocache listings. If <b>can_set_region</b> is
+                <b>false</b>, then the return value currently is <b>null</b>,
+                but this may change. Also, the length of the codes (which
+                currently is always 4 characters) may change.</p>
+            </li>
+            <li>
+                <p><b>can_set_region</b> - boolean, <b>true</b> if
+                <a href='%OKAPI:methodargref:services/caches/edit%'>services/caches/edit</a>
+                will accept the <b>region</b> parameter. If <b>false</b>,
+                then this installation will automatically calculate region
+                from the cache location.</p>
             </li>
             <li>
                 <p><b>password_max_length</b> - the maximum length of
