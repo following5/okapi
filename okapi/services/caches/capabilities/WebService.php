@@ -126,6 +126,11 @@ class WebService
         }
         if ($primary_langs === null)
         {
+            # We start with the configured language set of the OC site,
+            # then try to detect other significant languages.
+
+            $primary_langs = Settings::get('SITELANGS');
+
             # Calculate statistics of the languages that are used by the most
             # number of owners of active caches. As estimated from develsite,
             # this query runs << 1 second on the largest site, OCDE.
@@ -144,19 +149,20 @@ class WebService
                 $total_owners += $row['count'];
             }
 
-            # Do some educated guess of significant language set, after anlaysis
-            # of OCDE and OCPL data and estimates for small OC sites.
+            # Do some educated guess of additional significant languages, based
+            # on anlaysis of OCDE and OCPL data and estimates for small OC sites.
 
-            if ($total_owners == 0) {
-                $primary_langs = [Settings::get('SITELANG')];
-            } else {
+            if ($total_owners > 0) {
                 $threshold = floor(log($total_owners) - 1);
                 $primary_langs = [];
                 foreach ($language_stats as $row) {
-                    if ($row['count'] >= $threshold)
-                        $primary_langs[] = $row['lang'];
-                    else
+                    if ($row['count'] >= $threshold) {
+                        if (!in_array($row['lang'], $primary_langs)) { 
+                            $primary_langs[] = $row['lang'];
+                        }
+                    } else {
                         break;
+                    }
                 }
             }
 
