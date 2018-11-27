@@ -37,7 +37,7 @@
         <p>New type of the cache; one of the identifiers listed in the <b>types</b>
         field of <a href='%OKAPI:methodargref:services/caches/capabilities%'>services/caches/capabilities</a>.</p>
     </opt>
-    <opt name='size'>
+    <opt name='size2'>
         <p>New size of the cache; one of the identifiers listed in the <b>sizes</b>
         field of <a href='%OKAPI:methodargref:services/caches/capabilities%'>services/caches/capabilities</a>.</p>
     </opt>
@@ -81,7 +81,7 @@
 
         <p><b>Note:</b> If you want to "remove a language" from the cache,
         submit an empty <b>description</b> <i>and</i> <b>short_description</b>
-        <i>and</i> <b>hint</b> for that language.</p>
+        <i>and</i> <b>hint2</b> for that language.</p>
     </opt>
     <opt name='short_description'>
         <p>A plaintext string with a new single line (very short) description
@@ -100,7 +100,7 @@
         return <b>success</b>=<b>false</b> and a message that prompts the user
         to also provide a translation of the full description.</p>
     </opt>
-    <opt name='hint'>
+    <opt name='hint2'>
         <p>A plaintext, optional multiline string of cache hints/spoilers;
         will usually be ROT13-encoded for display. The language of the hint
         must be supplied as <b>language</b> argument. If a hint for this
@@ -111,7 +111,7 @@
     </opt>
     <opt name='language'>
         <p>The language of the given <b>short_description</b>, <b>description</b>
-        and <b>hint</b> texts; one of the language codes as returned in the
+        and <b>hint2</b> texts; one of the language codes as returned in the
         <b>languages</b> field of
         <a href='%OKAPI:methodargref:services/caches/capabilities%'>services/caches/capabilities</a>.</p>
     </opt>

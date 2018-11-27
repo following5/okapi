@@ -134,21 +134,21 @@ class WebService
                 unset($coords);
             }
 
-            # size -- DEPENDS ON TYPE
+            # size2 -- DEPENDS ON TYPE
 
-            $size = $request->get_parameter('size');
-            if ($size !== null)
+            $size2 = $request->get_parameter('size2');
+            if ($size2 !== null)
             {
                 # We allow to confirm an existing size, even if it is no longer
                 # available for the cache's type. OC websites do the same.
 
-                if ($size != $cache['size2']) {
-                    if (!in_array($size, Okapi::get_local_cachesizes()))
-                        throw new InvalidParam('size', "'".$size."' is not a valid cache size (at this OC site).");
-                    elseif (!in_array($size, $capabilities['sizes']))
-                        $problems['size'] = _("This size is not available for this type of cache.");
+                if ($size2 != $cache['size2']) {
+                    if (!in_array($size2, Okapi::get_local_cachesizes()))
+                        throw new InvalidParam('size2', "'".$size2."' is not a valid cache size (at this OC site).");
+                    elseif (!in_array($size2, $capabilities['sizes']))
+                        $problems['size2'] = _("This size is not available for this type of cache.");
                     else
-                        $change_sqls_escaped[] = "size = ".Okapi::cache_size2_to_sizeid($size);
+                        $change_sqls_escaped[] = "size = ".Okapi::cache_size2_to_sizeid($size2);
                 }
             }
             elseif ($type !== $cache['type'] && !in_array($cache['size2'], $capabilities['sizes']))
@@ -356,15 +356,15 @@ class WebService
                 unset($attr_problems);
             }
 
-            # Note: We allow to combine A1 attribute & GC code, because this
-            # is valid if the GC cache is archived (which we cannot validate).
+            # TODO: Detect conflicting attribute/cachetype combinations.
+            # OC websites don't do it, but it would improve content quality.
 
-            # descriptions and hint
+            # description, short_description and hint2
 
             $description = $request->get_parameter('description');
             $short_description = $request->get_parameter('short_description');
-            $hint = $request->get_parameter('hint');
-            $desc_params_given = ($description !== null || $short_description !== null || $hint !== null);
+            $hint2 = $request->get_parameter('hint2');
+            $desc_params_given = ($description !== null || $short_description !== null || $hint2 !== null);
 
             if ($desc_params_given)
             {
@@ -397,12 +397,12 @@ class WebService
                     $short_description = preg_replace('/[\r\n\t]+/', ' ', $short_description);
                     $short_description = trim($short_description);
                 }
-                if ($hint != '') {
+                if ($hint2 != '') {
                     # Both OC branches store the hint as HTML with \r\n line breaks.
 
-                    $hint = htmlspecialchars(trim($hint), ENT_COMPAT);
-                    $hint = preg_replace('~\R~u', "\r\n", $hint);   # https://stackoverflow.com/questions/7836632
-                    $hint = nl2br($hint);
+                    $hint2 = htmlspecialchars(trim($hint2), ENT_COMPAT);
+                    $hint2 = preg_replace('~\R~u', "\r\n", $hint2);   # https://stackoverflow.com/questions/7836632
+                    $hint2 = nl2br($hint2);
                 }
 
                 # validate descriptions and hint
@@ -420,13 +420,13 @@ class WebService
                 ");
                 if ($is_new_language)
                 {
-                    if ($description.$short_description.$hint == '')
+                    if ($description.$short_description.$hint2 == '')
                     {
                         # Return messages with priority in mostly used field.
                         if ($description !== null)
                             $problems['description'] = _("Please enter some text.");
-                        elseif ($hint !== null)
-                            $problems['hint'] = _("Please enter some text.");
+                        elseif ($hint2 !== null)
+                            $problems['hint2'] = _("Please enter some text.");
                         else
                             $problems['short_description'] = _("Please enter some text.");
                     }
@@ -449,7 +449,7 @@ class WebService
                                     "not just the short description."
                                 );
                             } else {
-                                $problems['hint'] = _("Please also translate the description.");
+                                $problems['hint2'] = _("Please also translate the description.");
                             }
                         }
                     }
@@ -470,7 +470,7 @@ class WebService
         {
             Db::execute("start transaction");
 
-            # description, short_description, hint
+            # description, short_description, hint2
 
             if ($desc_params_given)
             {
@@ -508,7 +508,7 @@ class WebService
                                 '".Db::escape_string($description)."',
                                 '".Db::escape_string($value_for_desc_html_field)."',
                                 '".Db::escape_string(Okapi::get_default_value_for_text_htmledit($request->token->user_id))."',
-                                '".Db::escape_string($hint)."',
+                                '".Db::escape_string($hint2)."',
                                 '".Db::escape_string($short_description)."',
                                 now(),
                                 now()
@@ -550,7 +550,7 @@ class WebService
                         $effective_short_desc =
                             $short_description !== null ? $short_description : trim($row['short_desc']);
                         $effective_hint =
-                            $hint !== null ? $hint : trim($row['hint']);
+                            $hint2 !== null ? $hint2 : trim($row['hint']);
                     }
                     if (!$is_only_language
                         && $effective_desc.$effective_short_desc.$effective_hint == ''
@@ -568,8 +568,8 @@ class WebService
                             $desc_change_sqls_escaped[] = "`desc` = '".Db::escape_string($description)."'";
                         if ($short_description !== null)
                             $desc_change_sqls_escaped[] = "short_desc = '".Db::escape_string($short_description)."'";
-                        if ($hint !== null)
-                            $desc_change_sqls_escaped[] = "hint = '".Db::escape_string($hint)."'";
+                        if ($hint2 !== null)
+                            $desc_change_sqls_escaped[] = "hint = '".Db::escape_string($hint2)."'";
                         Db::execute("
                             update cache_desc
                             set ".implode(", ", $desc_change_sqls_escaped)."
