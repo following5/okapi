@@ -41,7 +41,7 @@
             <li>
                 <p><b>sizes</b> - list of the  cache sizes which are currently
                 available at this installation [for the given <b>cache_type</b>].
-                Note that the returned sizes identifiers correspond the <b>size2</b>
+                Note that the returned identifiers correspond the <b>size2</b>
                 field of <a href='%OKAPI:methodargref:services/caches/geocache%'>services/caches/geocache</a>,
                 not the deprecated <span class='deprecated'><b>size</b></span> field.</p>
             </li>

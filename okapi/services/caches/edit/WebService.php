@@ -285,7 +285,7 @@ class WebService
             $acodes_to_add = [];
 
             $attributes = $request->get_parameter('attributes');
-            if ($attributes !== null)
+            if ($attributes)   # empty list is allowed
             {
                 $attr_problems = [];
                 $available_acodes = OkapiServiceRunner::call(
@@ -327,7 +327,7 @@ class WebService
                 if ($tmp = array_intersect($acodes_to_remove, $acodes_to_add)) {
                     throw new InvalidParam(
                         'attributes',
-                        "Contraticting operations for ".implode(' and ', $tmp)
+                        "You tried to add AND remove the attribute(s) ".implode(' and ', $tmp)
                     );
                 }
                 $effective_acodes = array_merge(
@@ -345,6 +345,8 @@ class WebService
                                 $available_acodes[$acode]['name'],
                                 $available_acodes[$incompatible]['name']
                             );
+                            # Attribute incompatibility is mutual. Take care that we
+                            # don't inform the user *twice* for the same attribute pair:
                             $already_warned[$acode.$incompatible] = true;
                         }
                 unset($already_warned);
@@ -440,7 +442,7 @@ class WebService
                         if (Db::select_value("
                             select 1 from cache_desc
                             where cache_id = '".$cache_internal_id_escaped."'
-                            and trim(desc) != ''
+                            and trim(`desc`) != ''
                             limit 1
                         ")) {
                             if ($short_description != '') {
@@ -537,20 +539,20 @@ class WebService
                         from cache_desc
                         where cache_id = '".$cache_internal_id_escaped."'
                     ") <= 1;
+                    $old_desc = Db::select_row("
+                        select `desc`, short_desc, hint
+                        from cache_desc
+                        where cache_id = '".$cache_internal_id_escaped."'
+                        and language='".$language_upper_escaped."'
+                    ");
                     if (!$is_only_language)
                     {
-                        $row = Db::select_row("
-                            select desc, short_desc, hint
-                            from cache_desc
-                            where cache_id = '".$cache_internal_id_escaped."'
-                            and language='".$language_upper_escaped."'
-                        ");
                         $effective_desc =
-                            $description !== null ? $description : trim($row['desc']);
+                            $description !== null ? $description : trim($old_desc['desc']);
                         $effective_short_desc =
-                            $short_description !== null ? $short_description : trim($row['short_desc']);
+                            $short_description !== null ? $short_description : trim($old_desc['short_desc']);
                         $effective_hint =
-                            $hint2 !== null ? $hint2 : trim($row['hint']);
+                            $hint2 !== null ? $hint2 : trim($old_desc['hint']);
                     }
                     if (!$is_only_language
                         && $effective_desc.$effective_short_desc.$effective_hint == ''
@@ -563,22 +565,29 @@ class WebService
                     }
                     else
                     {
-                        $desc_change_sqls_escaped = ["last_modified = now()"];
-                        if ($description !== null)
+                        $desc_change_sqls_escaped = [];
+                        if ($description !== null && $description != $old_desc['desc']) {
                             $desc_change_sqls_escaped[] = "`desc` = '".Db::escape_string($description)."'";
-                        if ($short_description !== null)
+                        }
+                        if ($short_description !== null && $short_description != $old_desc['short_desc']) {
                             $desc_change_sqls_escaped[] = "short_desc = '".Db::escape_string($short_description)."'";
-                        if ($hint2 !== null)
+                        }
+                        if ($hint2 !== null && $hint2 != $old_desc['hint']) {
                             $desc_change_sqls_escaped[] = "hint = '".Db::escape_string($hint2)."'";
-                        Db::execute("
-                            update cache_desc
-                            set ".implode(", ", $desc_change_sqls_escaped)."
-                            where cache_id = '".$cache_internal_id_escaped."'
-                            and language = '".$language_upper_escaped."'
-                        ");
+                        }
+                        if ($desc_change_sqls_escaped) {
+                            $desc_change_sqls_escaped[] = "last_modified = now()";
+                            Db::execute("
+                                update cache_desc
+                                set ".implode(", ", $desc_change_sqls_escaped)."
+                                where cache_id = '".$cache_internal_id_escaped."'
+                                and language = '".$language_upper_escaped."'
+                            ");
+                        }
                         unset($desc_change_sqls_escaped);
                     }
                     unset($is_only_language);
+                    unset($old_desc);
                     unset($effective_desc);
                     unset($effective_short_desc);
                     unset($effective_hint);
@@ -592,7 +601,7 @@ class WebService
 
                 $cache_desclangs = Db::select_value("
                     select desc_languages
-                    from cache
+                    from caches
                     where cache_id = '".$cache_internal_id_escaped."'
                 ");
                 $cache_default_desclang = substr($cache_desclangs, 0, 2);
