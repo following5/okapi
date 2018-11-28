@@ -1477,15 +1477,13 @@ class WebService
             }
             if (in_array('state', $fields)) {
                 foreach ($results as $cache_code => &$row_ref)
-                    $row_ref['state'] = isset($regions[$cache_code]) ? $regions[$cache_code] : null;
+                    $row_ref['state'] = isset($states[$cache_code]) ? $states[$cache_code] : null;
             }
-            if (in_array('region', $fields))
-            {
+            if (in_array('region', $fields)) {
                 foreach ($results as $cache_code => &$row_ref)
-                    $row_ref['region'] = isset($regions[$cache_code]) ? $regions[$cache_code] : null;
+                    $row_ref['region'] = isset($regions[$cache_code]) ? $regions[$cache_code] : '';
             }
-            if (in_array('region_code', $fields))
-            {
+            if (in_array('region_code', $fields)) {
                 foreach ($results as $cache_code => &$row_ref)
                     $row_ref['region_code'] = isset($region_codes[$cache_code]) ? $region_codes[$cache_code] : null;
             }
@@ -1505,8 +1503,6 @@ class WebService
             unset($country_codes2names);
             unset($broken_okapi_country_field);
         }
-        unset($state_requested);
-        unset($region_requested);
 
         # Attribution note
 

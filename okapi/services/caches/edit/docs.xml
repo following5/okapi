@@ -29,8 +29,7 @@
         <i>lon</i> are in full degrees with a dot as a decimal point).</p>
 
         <p><b>Note:</b> If you allow your user to freely edit the cache
-        location, then you MUST also allow to edit the country and - if your
-        application is intended to be used with OCPL-based sites - the region
+        location, then you MUST also allow to edit the country and region
         (see below).</p>
 
         <p><b>Note:</b> Most OC installations calculate additional information
@@ -50,7 +49,7 @@
         (if any), or <b>null</b> for "no region specified".</p>
         <p><b>Note:</b> Some installations will automatically calculate the
         region frome cache coordinates (usually with some minutes delay).
-        These installations will <i>ignore</i> the <b>region</b> parameter.
+        These installations will <i>ignore</i> the <b>region_code</b> parameter.
         You can detect those installations by the <b>can_set_region</b>
         field of
         <a href='%OKAPI:methodargref:services/caches/capabilities%'>services/caches/capabilities</a>

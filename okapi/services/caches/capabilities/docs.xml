@@ -21,8 +21,8 @@
         <p>Pipe-separated list of ISO 639-1 language codes. This indicates the
         order of preference in which language will be chosen for the names in
         fields <b>languages</b> and <b>countries</b>. Note that this option is
-        <i>ignored</i> for the <b>regions</b> field, which will return each
-        name in local language.</p>
+        <i>ignored</i> for the <b>regions</b> field, which will always return
+        names in local language.</p>
     </opt>
     <opt name='cache_type'>
         <p>One of the cache type indentifiers returned in the <b>types</b>
@@ -83,17 +83,18 @@
             </li -->
             <li>
                 <p><b>regions</b> - a dictionary (country code => region) of
-                dictionaries (region code => name) of regions that can be
-                assigned to geocache listings. If <b>can_set_region</b> is
-                <b>false</b>, then the return value currently is <b>null</b>,
-                but this may change. Also, the length of the codes (which
-                currently is always 4 characters) may change.</p>
+                countries, each containing a dictionary (region code => name)
+                of regions that can be assigned to geocache listings. If
+                <b>can_set_region</b> is <b>false</b>, then the return value
+                currently is <b>null</b>, but this may change. Also, the
+                length of the codes (which currently is always 4 characters)
+                may change.</p>
             </li>
             <li>
                 <p><b>can_set_region</b> - boolean, <b>true</b> if
                 <a href='%OKAPI:methodargref:services/caches/edit%'>services/caches/edit</a>
                 will accept the <b>region</b> parameter. If <b>false</b>,
-                then this installation will automatically calculate region
+                then this installation will automatically calculate regions
                 from the cache location.</p>
             </li>
             <li>
