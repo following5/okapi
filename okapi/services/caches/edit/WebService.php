@@ -15,6 +15,10 @@ use okapi\lib\OCPLSignals;
 use okapi\Settings;
 use okapi\services\attrs\AttrHelper;
 
+# TODO:
+# - change 'attributes' to 'attr_acodes'
+# - use (only) multi-language dictionaries for descriptions, short descriptions, hints
+#   (drop 'language')
 
 class WebService
 {

@@ -19,6 +19,12 @@
         <p>Pipe-separated list of field names which you are interested with.
         Selected fields will be included in the response. See below for the
         list of available fields.</p>
+        <p>Alternatively, the phrase <b>for editing</b> (instead of a field
+        list) will include all fields that are editable by
+        <a href='%OKAPI:methodargref:services/caches/edit%'>services/caches/edit</a>.
+        It will also adjust the contents of the <b>descriptions</b> field
+        to be editable. Note the <b>for editing</b> is only available
+        through Level 3 Authentication for the owner of the cache,</p>
     </opt>
     <opt name='attribution_append' default='full'>
         <p>By default, OKAPI appends the value of <b>attribution_note</b> field to all the
@@ -379,24 +385,10 @@
             </li>
             <li>
                 <b>descriptions</b> - a dictionary (language code =&gt;
-                <a href='%OKAPI:docurl:html%'>HTML string</a>) of cache descriptions,
-            </li>
-            <li>
-                <p><b>editable_description</b> - <a href='%OKAPI:docurl:html%'>HTML string</a>,
-                description text of the cache without any supplements. This is
-                intended for
-                <a href="%OKAPI:methodargref:services/caches/edit%">editing</a>.</p>
-                <p>This information is only accessible for the cache owner through
-                level 3 authentication; otherwise <b>null</b> will be returned.</p>
-            </li>
-            <li>
-                <p><b>editable_descriptions</b> - a dictionary (language code =&gt;
-                <a href='%OKAPI:docurl:html%'>HTML string</a>) of cache
-                descriptions without any supplements. They are
-                intended for
-                <a href="%OKAPI:methodargref:services/caches/edit%">editing</a>.</p>
-                <p>This information is only accessible for the cache owner through
-                level 3 authentication; otherwise <b>null</b> will be returned.</p>
+                <a href='%OKAPI:docurl:html%'>HTML string</a>) of cache descriptions.
+                They will include the same additional notices as the <b>description</b>
+                field, unless the option <b>fields</b>=<b>for editing</b> is supplied,
+                which will <i>exclude</i> any additional notices,
             </li>
             <li class="deprecated">
                 <b>hint</b> - <a href='%OKAPI:docurl:html%'>HTML-encoded</a>
