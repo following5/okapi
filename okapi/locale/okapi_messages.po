@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OKAPI\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-15 00:22+0100\n"
-"PO-Revision-Date: 2019-01-15 00:23+0100\n"
+"POT-Creation-Date: 2019-01-15 00:56+0100\n"
+"PO-Revision-Date: 2019-01-15 00:57+0100\n"
 "Last-Translator: following <following@online.de>\n"
 "Language-Team: following <following@online.de>\n"
 "Language: en_EN\n"
@@ -11,12 +11,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
-"X-Poedit-Basepath: ../../../server-3.0/htdocs/vendor/opencaching/okapi/"
-"okapi\n"
+"X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Generator: Poedit 2.2\n"
 "X-Poedit-SearchPath-0: .\n"
+
+#: OkapiUrls.php:40
+msgid "translation test"
+msgstr ""
 
 #: services/caches/edit/WebService.php:89
 #, php-format
@@ -225,6 +228,7 @@ msgid_plural ""
 "You don't have any recommendations to give. Find %d more caches first!"
 msgstr[0] ""
 msgstr[1] ""
+"Du musst noch %d Caches finden, um eine weitere Bewertung abgeben zu können."
 
 #: services/logs/delete/WebService.php:124
 msgid "Your log entry has been deleted."
