@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: okapi\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-15 01:30+0100\n"
-"PO-Revision-Date: 2019-01-15 00:37\n"
+"PO-Revision-Date: 2019-01-15 00:47\n"
 "Last-Translator: following5 <following@online.de>\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -22,7 +22,7 @@ msgstr ""
 
 #: OkapiUrls.php:42
 msgid "test for translations"
-msgstr ""
+msgstr "Test für Übersetzungen"
 
 #: services/caches/edit/WebService.php:89
 #, php-format
