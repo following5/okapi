@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: okapi\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-15 00:56+0100\n"
-"PO-Revision-Date: 2019-01-15 00:08\n"
+"PO-Revision-Date: 2019-01-15 00:10\n"
 "Last-Translator: following5 <following@online.de>\n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -36,61 +36,61 @@ msgstr ""
 
 #: services/caches/formatters/gpx/WebService.php:405
 msgid "<b>Geocache coordinates have been changed.</b> They have been replaced with your own custom coordinates which you have provided for this geocache."
-msgstr ""
+msgstr "<b>Coordonatele geocutiei au fost modificate.</b> Acestea au fost înlocuite cu coordonate alese de tine pentru această geocutie."
 
 #: services/caches/formatters/gpx/WebService.php:411
 msgid "<b>Geocache coordinates have been changed.</b> Currently they point to one of the alternate waypoints originally described as:"
-msgstr ""
+msgstr "<b>Coordonatele acestei geocutii au fost modificate.</b> Acestea indică unul din punctele suplimentare descris ca:"
 
 #: services/caches/formatters/gpx/WebService.php:424
 msgid "Original geocache location"
-msgstr ""
+msgstr "Coordonatele iniţiale ale geocutiei"
 
 #: services/caches/formatters/gpx/WebService.php:427
 #, php-format
 msgid "Original (owner-supplied) location of the %s geocache"
-msgstr ""
+msgstr "Coordonatele originale (aşa cum au fost publicate de proprietar) ale geocutiei %s"
 
 #: services/caches/formatters/gpx/gpxfile.tpl.php:56
 #: services/caches/formatters/gpx/gpxfile.tpl.php:91
 msgid "hidden by"
-msgstr ""
+msgstr "ascunsă de"
 
 #: services/caches/formatters/gpx/gpxfile.tpl.php:93
 #, php-format
 msgid "%d recommendation"
 msgid_plural "%d recommendations"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "o recomandare"
+msgstr[1] "%d recomandări"
+msgstr[2] "%d recomandări"
 
 #: services/caches/formatters/gpx/gpxfile.tpl.php:94
 #, php-format
 msgid "found %d time"
 msgid_plural "found %d times"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "găsită o singură dată"
+msgstr[1] "găsită de %d ori"
+msgstr[2] "găsită de %d ori"
 
 #: services/caches/formatters/gpx/gpxfile.tpl.php:97
 #, php-format
 msgid "%d trackable"
 msgid_plural "%d trackables"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "un obiect călător"
+msgstr[1] "%d obiecte călătoare"
+msgstr[2] "%d obiecte călătoare"
 
 #: services/caches/formatters/gpx/gpxfile.tpl.php:101
 msgid "Personal notes"
-msgstr ""
+msgstr "Note personale"
 
 #: services/caches/formatters/gpx/gpxfile.tpl.php:105
 msgid "Attributes"
-msgstr ""
+msgstr "Atribute"
 
 #: services/caches/formatters/gpx/gpxfile.tpl.php:109
 msgid "Trackables"
-msgstr ""
+msgstr "Obiecte călătoare"
 
 #: services/caches/formatters/gpx/gpxfile.tpl.php:118
 msgid "Additional waypoints"
@@ -99,27 +99,27 @@ msgstr ""
 #: services/caches/formatters/gpx/gpxfile.tpl.php:131
 #: services/caches/formatters/gpx/gpxfile.tpl.php:147
 msgid "Images"
-msgstr ""
+msgstr "Imagini"
 
 #: services/caches/formatters/gpx/gpxfile.tpl.php:154
 msgid "Spoilers"
-msgstr ""
+msgstr "Imagini (indicii?)"
 
 #: services/caches/formatters/gpx/gpxfile.tpl.php:163
 msgid "Image descriptions"
-msgstr ""
+msgstr "Descriere imagine"
 
 #: services/caches/formatters/gpx/gpxfile.tpl.php:171
 msgid "The cache probably is located in the following protection areas:"
-msgstr ""
+msgstr "Geocutia probabil că se află undeva în următoarele arii protejate:"
 
 #: services/caches/geocaches/WebService.php:732
 msgid "Parts of this geocache listing may be outdated."
-msgstr ""
+msgstr "O parte din informaţiile despre această geocutie s-ar putea să fie vechi şi neactualizate."
 
 #: services/caches/geocaches/WebService.php:734
 msgid "See the log entries for more information."
-msgstr ""
+msgstr "Vezi însemnările pentru mai multe informaţii."
 
 #: services/caches/geocaches/WebService.php:764
 msgid "Annotations by the Opencaching team:"
@@ -131,59 +131,59 @@ msgstr ""
 
 #: services/caches/geocaches/WebService.php:1350
 msgid "Stage"
-msgstr ""
+msgstr "Etapă"
 
 #: services/caches/geocaches/WebService.php:1394
 msgid "User location"
-msgstr ""
+msgstr "Poziţia utilizatorului"
 
 #: services/caches/geocaches/WebService.php:1398
 #, php-format
 msgid "Your own custom coordinates for the %s geocache"
-msgstr ""
+msgstr "Coordonatele modificate de tine pentru geocutia %s"
 
 #: services/caches/geocaches/WebService.php:1636
 msgid "National Park / Landscape"
-msgstr ""
+msgstr "Rezervaţie naturală"
 
 #: services/caches/geocaches/WebService.php:1820
 #, php-format
 msgid "This <a href='%s'>geocache</a> description comes from the <a href='%s'>%s</a> site."
-msgstr ""
+msgstr "Descrierea <a href='%s'>geocutiei</a> provine de pe site-ul <a href='%s'>%s</a>."
 
 #: services/caches/geocaches/WebService.php:1832
 #, php-format
 msgid "&copy; <a href='%s'>%s</a>, <a href='%s'>%s</a>, <a href='https://creativecommons.org/licenses/by-nc-nd/3.0/de/deed.en'>CC-BY-NC-ND</a>, as of %s; all log entries &copy; their authors"
-msgstr ""
+msgstr "&copy; <a href='%s'>%s</a>, <a href='%s'>%s</a>, <a href='https://creativecommons.org/licenses/by-nc-nd/3.0/de/deed.en'>CC-BY-NC-ND</a>, din %s; toate însemnările &copy; autorii acestora"
 
 #: services/caches/geocaches/WebService.php:1843
 #, php-format
 msgid "&copy; <a href='%s'>%s</a>, <a href='%s'>%s</a>, <a href='https://creativecommons.org/licenses/by-nc-nd/3.0/de/deed.en'>CC-BY-NC-ND</a>; all log entries &copy; their authors"
-msgstr ""
+msgstr "&copy; <a href='%s'>%s</a>, <a href='%s'>%s</a>, <a href='https://creativecommons.org/licenses/by-nc-nd/3.0/de/deed.en'>CC-BY-NC-ND</a>; toate însemnările &copy; autorii acestora"
 
 #: services/logs/LogsCommon.php:70
 msgid "This cache is an Event cache. You cannot \"Find\" it (but you can attend it, or comment on it)!"
-msgstr ""
+msgstr "Această geocutie este un eveniment. Nu poate fi \"găsită\" (dar poţi anunţa că ai participat sau să scrii o notă)!"
 
 #: services/logs/LogsCommon.php:79
 msgid "This cache is NOT an Event cache. You cannot \"Attend\" it (but you can find it, or comment on it)!"
-msgstr ""
+msgstr "Această geocutie NU este un eveniment. Nu poţi \"participa\" (dar poţi să o găseşti sau să scrii o notă)!"
 
 #: services/logs/LogsCommon.php:95
 msgid "This cache requires a password. You didn't provide one!"
-msgstr ""
+msgstr "Această geocutie necesită o parolă. Nu ai furnizat nici o parolă!"
 
 #: services/logs/LogsCommon.php:99
 msgid "Invalid password!"
-msgstr ""
+msgstr "Parolă incorectă!"
 
 #: services/logs/LogsCommon.php:108
 msgid "Your have to supply some text for your comment."
-msgstr ""
+msgstr "Trebuie să scrii ceva atunci când postezi o însemnare."
 
 #: services/logs/LogsCommon.php:134
 msgid "You are trying to publish a log entry with a date in future. Cache log entries are allowed to be published in the past, but NOT in the future."
-msgstr ""
+msgstr "Ai încercat să postezi o însemnare datată în viitor. Însemnările se pot data în trecut, dar în viitor NU este permis."
 
 #: services/logs/LogsCommon.php:141
 msgid "You cannot attend an event before it takes place. Please check the log type and date."
@@ -195,7 +195,7 @@ msgstr ""
 
 #: services/logs/LogsCommon.php:281
 msgid "You have already submitted a \"Found it\" log entry once. Now you may submit \"Comments\" only!"
-msgstr ""
+msgstr "Deja ai trimis odată o însemnare \"Am găsit\". De atunci încolo poţi doar să scrii însemnări de tipul \"Scrie o notă\"!"
 
 #: services/logs/LogsCommon.php:283
 msgid "You have already submitted an \"Attended\" log entry once. Now you may submit \"Comments\" only!"
@@ -230,50 +230,50 @@ msgstr ""
 #: services/logs/images/edit/WebService.php:45
 #, php-format
 msgid "%s requires all images to have captions. Please provide one."
-msgstr ""
+msgstr "%s solicită ca toate imaginile să aibe o scurtă descriere. Te rog să scrii aceste descrieri."
 
 #: services/logs/images/add/WebService.php:96
 #, php-format
 msgid "Your image file is too large (%s.%s MB); %s accepts a maximum image size of %s.%s MB."
-msgstr ""
+msgstr "Poza este prea mare (%s.%s MB); %s acceptă o dimensiune maximă de %s.%s MB."
 
 #: services/logs/images/add/WebService.php:124
 #: services/logs/images/add/WebService.php:149
 #, php-format
 msgid "%s reported an error when it tried to read your file."
-msgstr ""
+msgstr "%s a raportat o eroare atunci când a încercat să citească fişierul tău."
 
 #: services/logs/images/add/WebService.php:128
 msgid "Make sure you are sending a file in an appropriate format (JPEG, PNG or GIF)."
-msgstr ""
+msgstr "Asigură-te că încarci o imagine folosind unul din formatele suportate (JPEG, PNG sau GIF)."
 
 #: services/logs/images/add/WebService.php:137
 #, php-format
 msgid "The image you have uploaded is too large (%s megapixels). Please use an external application to downscale it first. (You can also contact the developers of '%s' and ask them to downscale uploaded images automatically.)"
-msgstr ""
+msgstr "Imaginea pe care ai încărcat-o este prea mare (%s megapixeli). Te rog foloseşte o aplicaţie cu care să o micşorezi. (Totodata, poţi solicita dezvoltatorilor '%s' şi să le ceri să micşoreze automat imaginile încărcate.)"
 
 #: services/logs/images/add/WebService.php:408
 msgid "Image has been successfully saved."
-msgstr ""
+msgstr "Imaginea a fost salvată cu succes."
 
 #: services/logs/images/edit/WebService.php:205
 msgid "Image properties have been successfully updated."
-msgstr ""
+msgstr "Parametrii imaginii au fost actualizaţi cu succes."
 
 #: services/logs/submit/WebService.php:87
 #, php-format
 msgid "However, your cache rating was ignored, because %s does not have a rating system."
-msgstr ""
+msgstr "Votul tău a fost ignorat pentru ca %s nu are suport pentru voturi."
 
 #: services/logs/submit/WebService.php:112
 #, php-format
 msgid "However, your cache recommendation was ignored, because %s does not allow recommending event caches."
-msgstr ""
+msgstr "Recomandarea ta a fost ignoratăpentru ca %s nu are suport pentru recomandări."
 
 #: services/logs/submit/WebService.php:161
 #, php-format
 msgid "However, your \"does not need maintenance\" flag was ignored, because %s does not yet support this feature."
-msgstr ""
+msgstr "Indicatorul \"nu necesită întreţinere\" a fost ignorat deoarece %s încă nu are suport pentru această funcţionalitate."
 
 #: services/logs/submit/WebService.php:206
 msgid "However, your cache recommendation was ignored, because you may not recommend your own caches."
@@ -302,52 +302,52 @@ msgstr ""
 
 #: services/logs/submit/WebService.php:328
 msgid "You have already submitted a log entry with exactly the same contents."
-msgstr ""
+msgstr "Deja ai trimis o însemnare cu exact acelaşi conţinut."
 
 #: services/logs/submit/WebService.php:344
 msgid "You have already rated this cache once. Your rating cannot be changed."
-msgstr ""
+msgstr "Deja ai votat aceasta geocutie. Votul dat nu poate fi schimbat."
 
 #: services/logs/submit/WebService.php:357
 msgid "You have already recommended this cache once."
-msgstr ""
+msgstr "Deja ai recomandat această geocutie."
 
 #: services/logs/submit/WebService.php:420
 msgid "Event caches cannot \"need maintenance\"."
-msgstr ""
+msgstr "Geocutiile de tip eveniment nu pot fi marcate ca \"necesită întreţinere\""
 
 #: services/logs/submit/WebService.php:547
 msgid "Your cache log entry was posted successfully."
-msgstr ""
+msgstr "însemnarea ta a fost publicată."
 
 #: views/apps/authorize/authorize.tpl.php:5
 msgid "Authorization Form"
-msgstr ""
+msgstr "Formular de autorizare"
 
 #: views/apps/authorize/authorize.tpl.php:46
 msgid "Expired request"
-msgstr ""
+msgstr "Cerere expirată"
 
 #: views/apps/authorize/authorize.tpl.php:47
 msgid "Unfortunately, the request has expired. Please try again."
-msgstr ""
+msgstr "Din păcate cererea a expirat. Te rog încearcă din nou."
 
 #: views/apps/authorize/authorize.tpl.php:49
 msgid "External application is requesting access..."
-msgstr ""
+msgstr "O aplicaţie externă cere acces..."
 
 #: views/apps/authorize/authorize.tpl.php:50
 #, php-format
 msgid "<b>%s</b> wants to access your <b>%s</b> account. Do you agree to grant access to this application?"
-msgstr ""
+msgstr "<b>%s</b> solicită acces la contul tău: <b>%s</b>. Eşti de acord să permiţi accesul acestei aplicaţii?"
 
 #: views/apps/authorize/authorize.tpl.php:53
 msgid "I agree"
-msgstr ""
+msgstr "Sunt de acord"
 
 #: views/apps/authorize/authorize.tpl.php:54
 msgid "Decline"
-msgstr ""
+msgstr "Nu sunt de acord"
 
 #: views/apps/authorize/authorize.tpl.php:56
 #, php-format
@@ -359,15 +359,22 @@ msgid "\n"
 "                    by the OKAPI Framework, i.e. post log entries on geocaches in your name.\n"
 "                    You can revoke this permission at any moment.</p>\n"
 "                "
-msgstr ""
+msgstr "\n"
+"                    <p>Odată ce a fost acordat accesul unei aplicaţii, acesta este \n"
+"                    valabil până la revocare din pagina <a href='%s'>gestiune aplicaţii</a>.</p>\n"
+"                    <p>Aplicaţia îţi va accesa contul prin <a href='%s'>Interfaţa OKAPI</a>.\n"
+"                    Dacă permiţi accesul, aplicaţia va putea utiliza toate funcţiile puse la dispoziţie\n"
+"                    de Interfaţa OKAPI, de exemplu să posteze însemnări în numele tău.\n"
+"                    Poţi revoca această permisiune oricând.</p>\n"
+"                "
 
 #: views/apps/authorized/authorized.tpl.php:5
 msgid "Authorization Succeeded"
-msgstr ""
+msgstr "Autorizarea s-a efectuat cu succes"
 
 #: views/apps/authorized/authorized.tpl.php:28
 msgid "Access successfully granted"
-msgstr ""
+msgstr "Acces permis"
 
 #: views/apps/authorized/authorized.tpl.php:29
 #, php-format
@@ -375,15 +382,19 @@ msgid "\n"
 "                <p><b>You've just granted %s application access to your %s account.</b>\n"
 "                To complete the operation, go back to %s and enter the following PIN code:</p>\n"
 "            "
-msgstr ""
+msgstr "\n"
+"                <p><b>Tocmai ai permis acces aplicaţiei %s la contul tău: %s.</b>\n"
+"                Pentru a finaliza operaţiunea, mergi înapoi la %s şi introdu următorul\n"
+"                cod PIN:</p>\n"
+"            "
 
 #: views/apps/index/index.tpl.php:5
 msgid "My Apps"
-msgstr ""
+msgstr "Aplicaţiile mele"
 
 #: views/apps/index/index.tpl.php:29
 msgid "Your external applications"
-msgstr ""
+msgstr "Aplicaţiile tale externe"
 
 #: views/apps/index/index.tpl.php:31
 #, php-format
@@ -393,11 +404,17 @@ msgid "\n"
 "                    Once you click \"remove\" the application will no longer be able to perform any\n"
 "                    actions on your behalf.</p>\n"
 "                "
-msgstr ""
+msgstr "\n"
+"                    <p>Aceasta este lista aplicaţiilor cărora le-ai acordat permisiunea de a-ţi\n"
+"                    accesa contul <b>%s</b>.\n"
+"                    Această pagină îţi dă posibilitatea de a revoca orice acces permis anterior.\n"
+"                    Un singur click pe \"şterge\" şi acea aplicaţie nu va mai putea face nimic în \n"
+"                    numele contului tău.</p>\n"
+"                "
 
 #: views/apps/index/index.tpl.php:45
 msgid "remove"
-msgstr ""
+msgstr "şterge"
 
 #: views/apps/index/index.tpl.php:50
 #, php-format
@@ -406,5 +423,10 @@ msgid "\n"
 "                    access to your <b>%s</b> account. Currently no applications are authorized to act\n"
 "                    on your behalf. Once you start using external Opencaching applications, they will appear here.</p>\n"
 "                "
-msgstr ""
+msgstr "\n"
+"                    <p>Datorită <a href='%s'>Interfeţei OKAPI</a> poţi permite unor aplicaţii externe\n"
+"                    acces la contul tău: <b>%s</b>. În acest moment nu există aplicaţii autorizate \n"
+"                    să acţioneze în numele contului tău. Odată ce vei începe să foloseşti aplicaţii externe,\n"
+"                    ele vor apărea aici.</p>\n"
+"                "
 
