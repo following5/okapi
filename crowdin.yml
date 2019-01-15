@@ -1,3 +1,3 @@
 files:
-  - source: /okapi/locale/crowdin_source
+  - source: /okapi/locale/crowdin_source/okapi_messages.po
     translation: /okapi/locale/%locale_with_underscore%/%original_file_name%
