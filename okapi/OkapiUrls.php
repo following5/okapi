@@ -37,6 +37,6 @@ class OkapiUrls
     );
 }
 
-$test = _('translation test 2');
 
 # This line is used for commit-hooks testing: .............>
+$test = _('test text for translations');
